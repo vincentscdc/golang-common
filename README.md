@@ -6,9 +6,8 @@ common golang packages used at crypto.com
 
 | module                      | version | audit | coverage | benchmarks |
 |---|---|---|---|---|
-| transport/http/handlewrap   | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml) | | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlewrap) |
+| transport/http/handlewrap   | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml) | | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |
 | monitoring/otelinit         | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/monitoring_othelinit.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/monitoring_othelinit.audit.yml) | | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |
-
 
 ## How to add a new module?
 

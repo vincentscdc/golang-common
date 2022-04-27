@@ -47,7 +47,7 @@ jobs:
         working-directory: monitoring/otelinit
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=./coverage.out -service=github
+        run: goveralls -coverprofile=./coverage.out -service=github -package="monitoring/otelinit"
   sec-scan:
     runs-on: ubuntu-latest
     steps:

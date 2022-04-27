@@ -47,7 +47,7 @@ jobs:
         working-directory: transport/http/handlerwrap
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=./coverage.out -service=github
+        run: goveralls -coverprofile=./coverage.out -service=github -package="transport/http/handlerwrap"
   sec-scan:
     runs-on: ubuntu-latest
     steps:

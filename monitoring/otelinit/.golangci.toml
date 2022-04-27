@@ -90,11 +90,6 @@ enable = [
     # "varnamelen",
 ]
 
-[run]
-skip-dirs = [
-    "pkg/internal/db"
-]
-
 [[issues.exclude-rules]]
 path = '(.+)_test\.go'
 linters = ["funlen", "goconst", "interfacer", "dupl", "lll", "goerr113"]

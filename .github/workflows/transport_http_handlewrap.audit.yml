@@ -37,20 +37,17 @@ jobs:
           go-version: 1.18
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Install goveralls
+        run: go install github.com/mattn/goveralls@latest
       - name: Calc coverage
         working-directory: transport/http/handlerwrap
         run: |
-          go test -v  ./... -race -cover -covermode=atomic -coverprofile=./coverage.out
-      - name: Convert coverage.out to coverage.lcov
-        uses: jandelgado/gcov2lcov-action@v1.0.8
-        with:
-          working-directory: transport/http/handlerwrap        
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          base-path: ./transport/http/handlerwrap     
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./transport/http/handlerwrap/coverage.lcov
+          go test -v  ./... -cover -covermode=atomic -coverprofile=./coverage.out
+      - name: Send coverage
+        working-directory: transport/http/handlerwrap
+        env:
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goveralls -coverprofile=./coverage.out -service=github
   sec-scan:
     runs-on: ubuntu-latest
     steps:

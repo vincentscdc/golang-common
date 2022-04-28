@@ -9,6 +9,20 @@ common golang packages used at crypto.com
 | transport/http/handlewrap   | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |
 | monitoring/otelinit         | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/monitoring_otelinit.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/monitoring_otelinit.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |
 
+## How to use any of these private modules
+
+Force the use of ssh instead of https for git:
+
+```bash
+git config --global --add url."git@github.com:".insteadOf "https://github.com/"
+```
+
+Allow internal repositories under monacohq, simply add this line to your .zshrc or other, accordingly:
+
+```bash
+export GOPRIVATE="github.com/monacohq/*"
+```
+
 ## How to add a new module?
 
 Let's take an example of an opentelemetry module.

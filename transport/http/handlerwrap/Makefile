@@ -1,4 +1,4 @@
-.PHONY: help test test-leak bench bench-compare lint sec-scan upgrade release release-tag changelog-gen changelog-commit
+.PHONY: help test test-leak bench bench-compare lint sec-scan upgrade release release-tag changelog-gen changelog-commit docs-gen
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -78,3 +78,10 @@ changelog-gen:
 changelog-commit:
 	git commit -m $(MESSAGE_CHANGELOG_COMMIT) ./CHANGELOG.md
 
+########
+# docs #
+########
+
+docs-gen: ## generate docs as markdown thanks to https://github.com/princjef/gomarkdoc
+	@gomarkdoc --output README.md . && \
+	printf "\ndocs generated!\n"

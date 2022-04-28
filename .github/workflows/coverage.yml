@@ -33,7 +33,7 @@ jobs:
         working-directory: transport/http/handlerwrap
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -covermode=atomic -coverprofile=./coverage.out -service=github -package="transport/http/handlerwrap" -parallel -jobid=$(git rev-parse --short HEAD)
+        run: goveralls -covermode=atomic -coverprofile=./coverage.out -service=github -package="transport/http/handlerwrap" -flagname="transport/http/handlerwrap" -parallel -jobid=$(git rev-parse --short HEAD)
   coverage-monitoring-otelinit:
     runs-on: ubuntu-latest
     steps:
@@ -54,7 +54,7 @@ jobs:
         working-directory: monitoring/otelinit
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -covermode=atomic -coverprofile=./coverage.out -service=github -package="monitoring/otelinit" -parallel -jobid=$(git rev-parse --short HEAD)
+        run: goveralls -covermode=atomic -coverprofile=./coverage.out -service=github -package="monitoring/otelinit" -flagname="monitoring/otelinit" -parallel -jobid=$(git rev-parse --short HEAD)
   coveralls-finish:
     runs-on: ubuntu-latest
     needs: [coverage-transport-http-handlerwrap, coverage-monitoring-otelinit]

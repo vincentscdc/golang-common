@@ -1,13 +1,13 @@
-# golang-common
+# golang-common [![Coverage Status](https://coveralls.io/repos/github/monacohq/golang-common/badge.svg?t=cPxXZ8)](https://coveralls.io/github/monacohq/golang-common)
 
 common golang packages used at crypto.com
 
 ## Current modules
 
-| module                      | version | audit | coverage | benchmarks |
+| module                      | version | audit | benchmarks |
 |---|---|---|---|---|
-| transport/http/handlewrap   | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml) | | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |
-| monitoring/otelinit         | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/monitoring_othelinit.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/monitoring_othelinit.audit.yml) | | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |
+| transport/http/handlewrap   | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |
+| monitoring/otelinit         | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/monitoring_othelinit.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/monitoring_othelinit.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |
 
 ## How to add a new module?
 
@@ -36,6 +36,8 @@ Let's take an example of an opentelemetry module.
   - beware of your action name
   - beware of your "on" triggers
   - beware of the necessary working_directories, related to your module
-  
+
+- Add your module to the coverage github workflow
+
 - Create a pull request
 - Wait for review

@@ -3,17 +3,37 @@ name: "coverage"
 on:
   push:
     paths:
-      - 'monitoring/otelinit/**'
       - 'transport/http/handlerwrap/**'
+      - 'monitoring/otelinit/**'
       - '.github/workflows/**'
     branches: [ main ]
   pull_request:
     paths:
-      - 'monitoring/otelinit/**'
       - 'transport/http/handlerwrap/**'
+      - 'monitoring/otelinit/**'
     branches: [ main ]
 
 jobs:
+  coverage-transport-http-handlerwrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install goveralls
+        run: go install github.com/mattn/goveralls@latest
+      - name: Calc coverage
+        working-directory: transport/http/handlerwrap
+        run: |
+          go test -v  ./... -cover -race -covermode=atomic -coverprofile=./coverage.out
+      - name: Send coverage
+        working-directory: transport/http/handlerwrap
+        env:
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goveralls -covermode=atomic -coverprofile=./coverage.out -service=github -package="transport/http/handlerwrap" -parallel -jobid=$(git rev-parse --short HEAD)
   coverage-monitoring-otelinit:
     runs-on: ubuntu-latest
     steps:
@@ -27,26 +47,7 @@ jobs:
         run: go install github.com/mattn/goveralls@latest
       - name: Calc coverage
         working-directory: monitoring/otelinit
-        run: |
-          go test -v  ./... -cover -covermode=atomic -coverprofile=./coverage.out
-      - name: Send coverage
-        working-directory: monitoring/otelinit
-        env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -covermode=atomic -coverprofile=./coverage.out -service=github -package="monitoring/otelinit" -parallel -jobid=$(git rev-parse --short HEAD)
-  coverage-transport-http-handlerwrap:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install goveralls
-        run: go install github.com/mattn/goveralls@latest
-      - name: Calc coverage
-        working-directory: monitoring/otelinit
+        # SPECIAL CASE WITH NO RACE because of the trace global var
         run: |
           go test -v  ./... -cover -covermode=atomic -coverprofile=./coverage.out
       - name: Send coverage
@@ -56,7 +57,7 @@ jobs:
         run: goveralls -covermode=atomic -coverprofile=./coverage.out -service=github -package="monitoring/otelinit" -parallel -jobid=$(git rev-parse --short HEAD)
   coveralls-finish:
     runs-on: ubuntu-latest
-    needs: [coverage-monitoring-otelinit, coverage-transport-http-handlerwrap]
+    needs: [coverage-transport-http-handlerwrap, coverage-monitoring-otelinit]
     steps:
       - name: Install Go
         uses: actions/setup-go@v3

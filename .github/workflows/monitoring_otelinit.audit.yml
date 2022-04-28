@@ -28,26 +28,6 @@ jobs:
           working-directory: monitoring/otelinit
           version: v1.45.2
           args: --config=./.golangci.toml
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install goveralls
-        run: go install github.com/mattn/goveralls@latest
-      - name: Calc coverage
-        working-directory: monitoring/otelinit
-        run: |
-          go test -v  ./... -cover -covermode=atomic -coverprofile=./coverage.out
-      - name: Send coverage
-        working-directory: monitoring/otelinit
-        env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=./coverage.out -service=github -package="monitoring/otelinit"
   sec-scan:
     runs-on: ubuntu-latest
     steps:

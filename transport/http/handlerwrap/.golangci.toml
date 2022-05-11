@@ -99,8 +99,25 @@ enable = [
     "wsl",
 ]
 
+[linters-settings.godot]
+scope = "toplevel"
+capital = false
+
+[linters-settings.errcheck]
+check-type-assertions = true
+check-blank = true
+
+[linters-settings.govet]
+check-shadowing = true
+
+[linters-settings.revive]
+min-confidence = 0.0
+
+[linters-settings.prealloc]
+simple = false
+range-loops = true
+for-loops = true
+
 [[issues.exclude-rules]]
 path = '(.+)_test\.go'
-linters = ["funlen", "goconst", "interfacer", "dupl", "lll", "goerr113", "varnamelen"]
-
-
+linters = ["funlen", "goconst", "interfacer", "dupl", "lll", "goerr113", "varnamelen", "errcheck"]

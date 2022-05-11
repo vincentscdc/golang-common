@@ -26,7 +26,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           working-directory: monitoring/otelinit
-          version: v1.45.2
+          version: v1.46
           args: --config=./.golangci.toml
   sec-scan:
     runs-on: ubuntu-latest

@@ -1,95 +1,106 @@
 [service]
-golangci-lint-version =  "1.45"
+golangci-lint-version =  "1.46"
 
 [linters]
 disable-all = true
 enable = [
-    "asciicheck",
-    "bodyclose",
-    "cyclop",
     "deadcode",
+    "errcheck",
+    "gosimple",
+    "govet",
+    "ineffassign",
+    "staticcheck",
+    "structcheck",
+    "typecheck",
+    "unused",
+    "varcheck",
+
+    "asciicheck",
+    "bidichk",
+    "bodyclose",
+    "containedctx",
+    "contextcheck",
+    "cyclop",
+    "decorder",
     "depguard",
     "dogsled",
     "dupl",
     "durationcheck",
-    "errcheck",
+    "errchkjson",
+    "errname",
     "errorlint",
+    "execinquery",
     "exhaustive",
-    # "exhaustivestruct",
+    # "exhaustivestruct", deprecated
+    # "exhaustruct", quite difficult to enable for partial struct init
     "exportloopref",
-    # "forbidigo",
+    "forbidigo",
     "forcetypeassert",
-    # "funlen",
-    # "gci",
+    # "funlen", the complexity is covering most of issues
+    # "gci", it's hard to make gofumpt play well with gci
     "gochecknoglobals",
     "gochecknoinits",
     "gocognit",
     "goconst",
     "gocritic",
     "gocyclo",
-    # "godot",
+    # "godot", the dot is not always easy to add (multiline for ex)
     "godox",
     "goerr113",
     "gofmt",
     "gofumpt",
     "goheader",
     "goimports",
-    # "golint",
+    # "golint", deprecated
     "gomnd",
-    # "gomoddirectives",
+    "gomoddirectives",
     "gomodguard",
     "goprintffuncname",
     "gosec",
-    "gosimple",
-    "govet",
+    "grouper",
     "ifshort",
     "importas",
-    "ineffassign",
+    # "interfacer", deprecated
+    "ireturn",
     "lll",
+    "maintidx",
     "makezero",
+    # "maligned", deprecated
     "misspell",
     "nakedret",
     "nestif",
     "nilerr",
+    "nilnil",
     "nlreturn",
     "noctx",
     "nolintlint",
+    "nonamedreturns",
+    "nosprintfhostport",
     "paralleltest",
     "prealloc",
     "predeclared",
+    "promlinter",
     "revive",
     "rowserrcheck",
+    # "scopelint" , deprecated
     "sqlclosecheck",
-    "staticcheck",
-    "structcheck",
     "stylecheck",
+    # "tagliatelle", we don't want to force tags on all structs
+    "tenv",
+    # "testpackage", we don't want to force the use of a test package
     "thelper",
     "tparallel",
-    "typecheck",
     "unconvert",
     "unparam",
-    "unused",
-    "varcheck",
+    "varnamelen",
     "wastedassign",
     "whitespace",
     "wrapcheck",
     "wsl",
-
-    "bidichk",
-    "contextcheck",
-    "errname",
-    # "interfacer",
-    "ireturn",
-    # "maligned",
-    "nilnil",
-    "promlinter",
-    # "scopelint",
-    # "tagliatelle",
-    "tenv",
-    # "testpackage",
-    # "varnamelen",
 ]
 
 [[issues.exclude-rules]]
 path = '(.+)_test\.go'
-linters = ["funlen", "goconst", "interfacer", "dupl", "lll", "goerr113"]
+linters = ["funlen", "goconst", "interfacer", "dupl", "lll", "goerr113", "varnamelen"]
+
+

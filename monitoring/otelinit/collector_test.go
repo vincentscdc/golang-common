@@ -2,10 +2,7 @@ package otelinit
 
 import (
 	"context"
-	"fmt"
 	"testing"
-
-	"google.golang.org/grpc"
 )
 
 func TestWithGRPCTraceExporter(t *testing.T) {
@@ -28,10 +25,6 @@ func TestWithGRPCTraceExporter(t *testing.T) {
 
 			ctx := context.Background()
 			p := &provider{}
-
-			s := grpc.NewServer()
-			info := s.GetServiceInfo()
-			fmt.Printf("%#v", info)
 
 			if err := WithGRPCTraceExporter(ctx, "dwd")(p); err != nil {
 				t.Errorf("WithGRPCTraceExporter() expected error %t got %v", tt.wantErr, err)

@@ -17,8 +17,8 @@ func Wrapper(
 	f TypedHandler,
 ) http.HandlerFunc {
 	return http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			res, err := f(r)
+		func(respW http.ResponseWriter, req *http.Request) {
+			res, err := f(req)
 			if err != nil {
 				log.Error().
 					Err(err.Error).
@@ -26,34 +26,34 @@ func Wrapper(
 					Int("HTTPStatusCode", err.HTTPStatusCode).
 					Msg(err.ErrorMsg)
 
-				err.render(log, w, r)
+				err.render(log, respW, req)
 
 				return
 			}
 
-			res.render(log, w, r)
+			res.render(log, respW, req)
 		},
 	)
 }
 
 func render(
 	log zerolog.Logger,
-	acceptHeader string, // nolint: unparam
+	acceptHeader string,
 	httpStatusCode int,
 	responseBody interface{},
-	w http.ResponseWriter,
+	respW http.ResponseWriter,
 ) {
 	// nolint: gocritic
 	// LATER: add more encodings
 	switch acceptHeader {
 	default:
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(httpStatusCode)
+		respW.Header().Add("Content-Type", "application/json")
+		respW.WriteHeader(httpStatusCode)
 
-		if err := json.NewEncoder(w).Encode(responseBody); err != nil {
+		if err := json.NewEncoder(respW).Encode(responseBody); err != nil {
 			log.Error().Err(err).Msg("http render")
 
-			w.WriteHeader(http.StatusInternalServerError)
+			respW.WriteHeader(http.StatusInternalServerError)
 
 			return
 		}

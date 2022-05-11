@@ -18,44 +18,44 @@ type ErrorResponse struct {
 
 // NewErrorResponse creates a new ErrorResponse.
 func NewErrorResponse(
-	e error,
-	hsc int,
-	ec string,
+	err error,
+	httpStatusCode int,
+	errCode string,
 	msg string,
 ) *ErrorResponse {
 	return &ErrorResponse{
-		Error:          e,
-		HTTPStatusCode: hsc,
-		ErrorCode:      ec,
+		Error:          err,
+		HTTPStatusCode: httpStatusCode,
+		ErrorCode:      errCode,
 		ErrorMsg:       msg,
 	}
 }
 
-func (her *ErrorResponse) render(log zerolog.Logger, w http.ResponseWriter, r *http.Request) {
+func (her *ErrorResponse) render(log zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
 	render(
 		log,
-		r.Header.Get("Accept"),
+		req.Header.Get("Accept"),
 		her.HTTPStatusCode,
 		her,
-		w,
+		respW,
 	)
 }
 
 // IsEqual checks if an error response is equal to another.
-func (her *ErrorResponse) IsEqual(e1 *ErrorResponse) bool {
-	if !errors.Is(e1.Error, her.Error) {
+func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool {
+	if !errors.Is(errR1.Error, her.Error) {
 		return false
 	}
 
-	if e1.HTTPStatusCode != her.HTTPStatusCode {
+	if errR1.HTTPStatusCode != her.HTTPStatusCode {
 		return false
 	}
 
-	if e1.ErrorCode != her.ErrorCode {
+	if errR1.ErrorCode != her.ErrorCode {
 		return false
 	}
 
-	if e1.ErrorMsg != her.ErrorMsg {
+	if errR1.ErrorMsg != her.ErrorMsg {
 		return false
 	}
 

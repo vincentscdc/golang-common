@@ -12,7 +12,7 @@ type Response struct {
 	HTTPStatusCode int
 }
 
-func (hr *Response) render(log zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
+func (hr *Response) render(log *zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
 	render(
 		log,
 		req.Header.Get("Accept"),

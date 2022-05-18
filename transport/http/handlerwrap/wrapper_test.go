@@ -63,7 +63,9 @@ func TestWrapper(t *testing.T) {
 				return nil, tt.httpErrorResponse
 			}
 
-			handler := Wrapper(zl.Logger(), f)
+			logger := zl.Logger()
+
+			handler := Wrapper(&logger, f)
 
 			handler.ServeHTTP(nr, req)
 
@@ -95,7 +97,9 @@ func BenchmarkHTTPWrapper(b *testing.B) {
 		}, nil
 	}
 
-	handler := Wrapper(zl.Logger(), f)
+	logger := zl.Logger()
+
+	handler := Wrapper(&logger, f)
 
 	b.ResetTimer()
 

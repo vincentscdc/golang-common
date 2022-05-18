@@ -49,7 +49,9 @@ func TestErrorResponse_render(t *testing.T) {
 				ErrorMsg:       "test error user",
 			}
 
-			her.render(zl.Logger(), nr, req)
+			logger := zl.Logger()
+
+			her.render(&logger, nr, req)
 
 			resp := nr.Result()
 			defer resp.Body.Close()

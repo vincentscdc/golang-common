@@ -14,8 +14,7 @@ const (
 
 // BindBody will bind the body of the request to the given interface.
 func BindBody(r *http.Request, target interface{}) *ErrorResponse {
-	// nolint: gocritic
-	// LATER: add more encodings
+	// nolint: gocritic // LATER: add more encodings to fix this
 	switch r.Header.Get("Content-Type") {
 	default:
 		if err := json.NewDecoder(r.Body).Decode(target); err != nil {

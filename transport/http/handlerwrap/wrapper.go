@@ -13,7 +13,7 @@ type TypedHandler func(r *http.Request) (*Response, *ErrorResponse)
 
 // Wrapper will actually do the boring work of logging an error and render the response.
 func Wrapper(
-	log zerolog.Logger,
+	log *zerolog.Logger,
 	f TypedHandler,
 ) http.HandlerFunc {
 	return http.HandlerFunc(
@@ -37,14 +37,13 @@ func Wrapper(
 }
 
 func render(
-	log zerolog.Logger,
+	log *zerolog.Logger,
 	acceptHeader string,
 	httpStatusCode int,
 	responseBody interface{},
 	respW http.ResponseWriter,
 ) {
-	// nolint: gocritic
-	// LATER: add more encodings
+	// nolint: gocritic // LATER: add more encodings to fix this
 	switch acceptHeader {
 	default:
 		respW.Header().Add("Content-Type", "application/json")

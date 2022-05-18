@@ -35,7 +35,9 @@ func Example_post() {
 		}
 	}
 
-	Wrapper(zl.Logger(), createHandler()).ServeHTTP(nil, nil)
+	logger := zl.Logger()
+
+	Wrapper(&logger, createHandler()).ServeHTTP(nil, nil)
 }
 
 // Wrapping a GET http handler.
@@ -72,5 +74,7 @@ func Example_get() {
 		}
 	}
 
-	Wrapper(zl.Logger(), getHandler(getter)).ServeHTTP(nil, nil)
+	logger := zl.Logger()
+
+	Wrapper(&logger, getHandler(getter)).ServeHTTP(nil, nil)
 }

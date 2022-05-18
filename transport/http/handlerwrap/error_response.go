@@ -31,7 +31,7 @@ func NewErrorResponse(
 	}
 }
 
-func (her *ErrorResponse) render(log zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
+func (her *ErrorResponse) render(log *zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
 	render(
 		log,
 		req.Header.Get("Accept"),

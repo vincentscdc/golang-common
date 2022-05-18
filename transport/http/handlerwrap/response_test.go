@@ -49,7 +49,9 @@ func TestResponse_render(t *testing.T) {
 				HTTPStatusCode: tt.expectedStatus,
 			}
 
-			hr.render(zl.Logger(), nr, req)
+			logger := zl.Logger()
+
+			hr.render(&logger, nr, req)
 
 			resp := nr.Result()
 			defer resp.Body.Close()

@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ### Feat
 
 - Add otelinit and http handlerwrap
+- Add headers in handlerwrap response and errorresponse (#8)
 
 ### Fix
 

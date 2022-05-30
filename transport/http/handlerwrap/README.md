@@ -41,13 +41,16 @@ Wrapping a GET http handler\.
 			}
 
 			return &Response{
-				Body:           id,
-				HTTPStatusCode: http.StatusOK,
+				Body:       id,
+				Headers:    make(map[string]string),
+				StatusCode: http.StatusOK,
 			}, nil
 		}
 	}
 
-	Wrapper(zl.Logger(), getHandler(getter)).ServeHTTP(nil, nil)
+	logger := zl.Logger()
+
+	Wrapper(&logger, getHandler(getter)).ServeHTTP(nil, nil)
 }
 ```
 
@@ -78,13 +81,16 @@ Wrapping a POST http handler\.
 			log.Println(pr)
 
 			return &Response{
-				Body:           pr,
-				HTTPStatusCode: http.StatusCreated,
+				Body:       pr,
+				Headers:    make(map[string]string),
+				StatusCode: http.StatusCreated,
 			}, nil
 		}
 	}
 
-	Wrapper(zl.Logger(), createHandler()).ServeHTTP(nil, nil)
+	logger := zl.Logger()
+
+	Wrapper(&logger, createHandler()).ServeHTTP(nil, nil)
 }
 ```
 
@@ -94,11 +100,12 @@ Wrapping a POST http handler\.
 ## Index
 
 - [Constants](<#constants>)
-- [func Wrapper(log zerolog.Logger, f TypedHandler) http.HandlerFunc](<#func-wrapper>)
+- [func Wrapper(log *zerolog.Logger, f TypedHandler) http.HandlerFunc](<#func-wrapper>)
 - [type ErrorResponse](<#type-errorresponse>)
   - [func BindBody(r *http.Request, target interface{}) *ErrorResponse](<#func-bindbody>)
-  - [func NewErrorResponse(e error, hsc int, ec string, msg string) *ErrorResponse](<#func-newerrorresponse>)
-  - [func (her *ErrorResponse) IsEqual(e1 *ErrorResponse) bool](<#func-errorresponse-isequal>)
+  - [func NewErrorResponse(err error, headers map[string]string, statusCode int, errCode string, msg string) *ErrorResponse](<#func-newerrorresponse>)
+  - [func (her *ErrorResponse) AddHeaders(headers map[string]string)](<#func-errorresponse-addheaders>)
+  - [func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool](<#func-errorresponse-isequal>)
 - [type InternalServerError](<#type-internalservererror>)
   - [func (e InternalServerError) Error() string](<#func-internalservererror-error>)
   - [func (e InternalServerError) ToErrorResponse() *ErrorResponse](<#func-internalservererror-toerrorresponse>)
@@ -129,21 +136,22 @@ const (
 ## func [Wrapper](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/wrapper.go#L15-L18>)
 
 ```go
-func Wrapper(log zerolog.Logger, f TypedHandler) http.HandlerFunc
+func Wrapper(log *zerolog.Logger, f TypedHandler) http.HandlerFunc
 ```
 
 Wrapper will actually do the boring work of logging an error and render the response\.
 
-## type [ErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L12-L17>)
+## type [ErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L12-L18>)
 
 ErrorResponse is a wrapper for the error response body to have a clean way of displaying errors\.
 
 ```go
 type ErrorResponse struct {
-    Error          error  `json:"-"`
-    HTTPStatusCode int    `json:"-"`
-    ErrorCode      string `json:"error_code"`
-    ErrorMsg       string `json:"error_msg"`
+    Error      error             `json:"-"`
+    Headers    map[string]string `json:"-"`
+    StatusCode int               `json:"-"`
+    ErrorCode  string            `json:"error_code"`
+    ErrorMsg   string            `json:"error_msg"`
 }
 ```
 
@@ -155,23 +163,31 @@ func BindBody(r *http.Request, target interface{}) *ErrorResponse
 
 BindBody will bind the body of the request to the given interface\.
 
-### func [NewErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L20-L25>)
+### func [NewErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L21-L27>)
 
 ```go
-func NewErrorResponse(e error, hsc int, ec string, msg string) *ErrorResponse
+func NewErrorResponse(err error, headers map[string]string, statusCode int, errCode string, msg string) *ErrorResponse
 ```
 
 NewErrorResponse creates a new ErrorResponse\.
 
-### func \(\*ErrorResponse\) [IsEqual](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L45>)
+### func \(\*ErrorResponse\) [AddHeaders](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L39>)
 
 ```go
-func (her *ErrorResponse) IsEqual(e1 *ErrorResponse) bool
+func (her *ErrorResponse) AddHeaders(headers map[string]string)
+```
+
+AddHeaders add the headers to the error response it will overwrite a header if it already present\, but will leave others in place
+
+### func \(\*ErrorResponse\) [IsEqual](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L56>)
+
+```go
+func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool
 ```
 
 IsEqual checks if an error response is equal to another\.
 
-## type [InternalServerError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L66-L68>)
+## type [InternalServerError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L77-L79>)
 
 InternalServerError is an error that is returned when an internal server error occurs\.
 
@@ -181,13 +197,13 @@ type InternalServerError struct {
 }
 ```
 
-### func \(InternalServerError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L70>)
+### func \(InternalServerError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L81>)
 
 ```go
 func (e InternalServerError) Error() string
 ```
 
-### func \(InternalServerError\) [ToErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L74>)
+### func \(InternalServerError\) [ToErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L85>)
 
 ```go
 func (e InternalServerError) ToErrorResponse() *ErrorResponse
@@ -223,7 +239,7 @@ NamedURLParamsGetter is the interface that is used to parse the URL parameters\.
 type NamedURLParamsGetter func(ctx context.Context, key string) (string, *ErrorResponse)
 ```
 
-## type [NotFoundError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L79-L81>)
+## type [NotFoundError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L90-L92>)
 
 NotFoundError is an error that is returned when a resource is not found\.
 
@@ -233,13 +249,13 @@ type NotFoundError struct {
 }
 ```
 
-### func \(NotFoundError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L83>)
+### func \(NotFoundError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L94>)
 
 ```go
 func (e NotFoundError) Error() string
 ```
 
-### func \(NotFoundError\) [ToErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L87>)
+### func \(NotFoundError\) [ToErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L98>)
 
 ```go
 func (e NotFoundError) ToErrorResponse() *ErrorResponse
@@ -268,14 +284,15 @@ func (e ParsingParamError) Error() string
 func (e ParsingParamError) ToErrorResponse() *ErrorResponse
 ```
 
-## type [Response](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/response.go#L10-L13>)
+## type [Response](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/response.go#L10-L14>)
 
 Response is a wrapper for the response body\.
 
 ```go
 type Response struct {
-    Body           any
-    HTTPStatusCode int
+    Headers    map[string]string
+    Body       any
+    StatusCode int
 }
 ```
 

@@ -16,21 +16,25 @@ func TestResponse_render(t *testing.T) {
 
 	zl := zerolog.New(io.Discard).With()
 
+	responseHeaders := map[string]string{"x-frame-options": "DENY", "x-content-type-options": "nosniff"}
+
 	tests := []struct {
-		name           string
-		requestBody    any
-		accept         string
-		expectedStatus int
-		expectedBody   string
+		name            string
+		requestBody     any
+		accept          string
+		expectedStatus  int
+		expectedBody    string
+		expectedHeaders map[string]string
 	}{
 		{
 			name: "happy path",
 			requestBody: struct {
 				Test int `json:"test"`
 			}{Test: 123},
-			accept:         "application/json",
-			expectedStatus: http.StatusCreated,
-			expectedBody:   `{"test":123}`,
+			accept:          "application/json",
+			expectedStatus:  http.StatusCreated,
+			expectedBody:    `{"test":123}`,
+			expectedHeaders: responseHeaders,
 		},
 	}
 
@@ -45,8 +49,9 @@ func TestResponse_render(t *testing.T) {
 			nr := httptest.NewRecorder()
 
 			hr := &Response{
-				Body:           tt.requestBody,
-				HTTPStatusCode: tt.expectedStatus,
+				Body:       tt.requestBody,
+				StatusCode: tt.expectedStatus,
+				Headers:    responseHeaders,
 			}
 
 			logger := zl.Logger()
@@ -66,6 +71,14 @@ func TestResponse_render(t *testing.T) {
 				t.Errorf("expected response header %s, got %s", tt.accept, resp.Header.Get("Content-Type"))
 
 				return
+			}
+
+			for header, headerValue := range tt.expectedHeaders {
+				if resp.Header.Get(header) != headerValue {
+					t.Errorf("expected response header %s: %s, got %s: %s", header, headerValue, header, resp.Header.Get(header))
+
+					return
+				}
 			}
 
 			body, _ := io.ReadAll(resp.Body)

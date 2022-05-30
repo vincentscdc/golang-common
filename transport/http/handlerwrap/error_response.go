@@ -10,32 +10,43 @@ import (
 
 // ErrorResponse is a wrapper for the error response body to have a clean way of displaying errors.
 type ErrorResponse struct {
-	Error          error  `json:"-"`
-	HTTPStatusCode int    `json:"-"`
-	ErrorCode      string `json:"error_code"`
-	ErrorMsg       string `json:"error_msg"`
+	Error      error             `json:"-"`
+	Headers    map[string]string `json:"-"`
+	StatusCode int               `json:"-"`
+	ErrorCode  string            `json:"error_code"`
+	ErrorMsg   string            `json:"error_msg"`
 }
 
 // NewErrorResponse creates a new ErrorResponse.
 func NewErrorResponse(
 	err error,
-	httpStatusCode int,
+	headers map[string]string,
+	statusCode int,
 	errCode string,
 	msg string,
 ) *ErrorResponse {
 	return &ErrorResponse{
-		Error:          err,
-		HTTPStatusCode: httpStatusCode,
-		ErrorCode:      errCode,
-		ErrorMsg:       msg,
+		Error:      err,
+		Headers:    headers,
+		StatusCode: statusCode,
+		ErrorCode:  errCode,
+		ErrorMsg:   msg,
+	}
+}
+
+// AddHeaders add the headers to the error response
+// it will overwrite a header if it already present, but will leave others in place
+func (her *ErrorResponse) AddHeaders(headers map[string]string) {
+	for k, v := range headers {
+		her.Headers[k] = v
 	}
 }
 
 func (her *ErrorResponse) render(log *zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
 	render(
 		log,
-		req.Header.Get("Accept"),
-		her.HTTPStatusCode,
+		her.Headers,
+		her.StatusCode,
 		her,
 		respW,
 	)
@@ -47,7 +58,7 @@ func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool {
 		return false
 	}
 
-	if errR1.HTTPStatusCode != her.HTTPStatusCode {
+	if errR1.StatusCode != her.StatusCode {
 		return false
 	}
 
@@ -72,7 +83,7 @@ func (e InternalServerError) Error() string {
 }
 
 func (e InternalServerError) ToErrorResponse() *ErrorResponse {
-	return NewErrorResponse(e, http.StatusInternalServerError, "internal_error", "internal error")
+	return NewErrorResponse(e, make(map[string]string), http.StatusInternalServerError, "internal_error", "internal error")
 }
 
 // NotFoundError is an error that is returned when a resource is not found.
@@ -85,5 +96,5 @@ func (e NotFoundError) Error() string {
 }
 
 func (e NotFoundError) ToErrorResponse() *ErrorResponse {
-	return NewErrorResponse(e, http.StatusNotFound, "not_found", e.Error())
+	return NewErrorResponse(e, make(map[string]string), http.StatusNotFound, "not_found", e.Error())
 }

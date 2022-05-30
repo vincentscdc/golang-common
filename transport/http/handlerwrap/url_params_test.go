@@ -56,10 +56,10 @@ func TestMissingParamError_ToErrorResponse(t *testing.T) {
 			name:   "happy path",
 			fields: fields{Name: "v"},
 			want: &ErrorResponse{
-				Error:          MissingParamError{Name: "v"},
-				HTTPStatusCode: http.StatusBadRequest,
-				ErrorCode:      "missing_param_error",
-				ErrorMsg:       "named URL param `v` is missing",
+				Error:      MissingParamError{Name: "v"},
+				StatusCode: http.StatusBadRequest,
+				ErrorCode:  "missing_param_error",
+				ErrorMsg:   "named URL param `v` is missing",
 			},
 		},
 	}
@@ -133,10 +133,10 @@ func TestParsingParamError_ToErrorResponse(t *testing.T) {
 			name:   "happy path",
 			fields: fields{Name: "v", Value: "xxx"},
 			want: &ErrorResponse{
-				Error:          ParsingParamError{Name: "v", Value: "xxx"},
-				HTTPStatusCode: http.StatusBadRequest,
-				ErrorCode:      "parsing_param_error",
-				ErrorMsg:       "can not parse named URL param `v`: `xxx` is invalid",
+				Error:      ParsingParamError{Name: "v", Value: "xxx"},
+				StatusCode: http.StatusBadRequest,
+				ErrorCode:  "parsing_param_error",
+				ErrorMsg:   "can not parse named URL param `v`: `xxx` is invalid",
 			},
 		},
 	}

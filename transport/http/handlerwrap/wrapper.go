@@ -23,7 +23,7 @@ func Wrapper(
 				log.Error().
 					Err(err.Error).
 					Str("ErrorCode", err.ErrorCode).
-					Int("HTTPStatusCode", err.HTTPStatusCode).
+					Int("HTTPStatusCode", err.StatusCode).
 					Msg(err.ErrorMsg)
 
 				err.render(log, respW, req)
@@ -38,16 +38,25 @@ func Wrapper(
 
 func render(
 	log *zerolog.Logger,
-	acceptHeader string,
-	httpStatusCode int,
+	headers map[string]string,
+	statusCode int,
 	responseBody interface{},
 	respW http.ResponseWriter,
 ) {
+	acceptHeader, ok := headers["Accept"]
+	if !ok {
+		acceptHeader = ""
+	}
+
 	// nolint: gocritic // LATER: add more encodings to fix this
 	switch acceptHeader {
 	default:
+		for header, headerValue := range headers {
+			respW.Header().Add(header, headerValue)
+		}
+
 		respW.Header().Add("Content-Type", "application/json")
-		respW.WriteHeader(httpStatusCode)
+		respW.WriteHeader(statusCode)
 
 		if err := json.NewEncoder(respW).Encode(responseBody); err != nil {
 			log.Error().Err(err).Msg("http render")

@@ -28,7 +28,7 @@ func TestWrapper(t *testing.T) {
 				Body: struct {
 					Test int `json:"test"`
 				}{Test: 123},
-				HTTPStatusCode: http.StatusCreated,
+				StatusCode: http.StatusCreated,
 			},
 			httpErrorResponse: nil,
 			expectedStatus:    http.StatusCreated,
@@ -37,10 +37,10 @@ func TestWrapper(t *testing.T) {
 			name:         "error path",
 			httpResponse: nil,
 			httpErrorResponse: &ErrorResponse{
-				Error:          fmt.Errorf("test render"),
-				HTTPStatusCode: http.StatusBadRequest,
-				ErrorCode:      "test_render",
-				ErrorMsg:       "test error user",
+				Error:      fmt.Errorf("test render"),
+				StatusCode: http.StatusBadRequest,
+				ErrorCode:  "test_render",
+				ErrorMsg:   "test error user",
 			},
 			expectedStatus: http.StatusBadRequest,
 		},
@@ -93,7 +93,7 @@ func BenchmarkHTTPWrapper(b *testing.B) {
 			}{
 				Test: 123,
 			},
-			HTTPStatusCode: 200,
+			StatusCode: 200,
 		}, nil
 	}
 

@@ -29,8 +29,9 @@ func Example_post() {
 			log.Println(pr)
 
 			return &Response{
-				Body:           pr,
-				HTTPStatusCode: http.StatusCreated,
+				Body:       pr,
+				Headers:    make(map[string]string),
+				StatusCode: http.StatusCreated,
 			}, nil
 		}
 	}
@@ -68,8 +69,9 @@ func Example_get() {
 			}
 
 			return &Response{
-				Body:           id,
-				HTTPStatusCode: http.StatusOK,
+				Body:       id,
+				Headers:    make(map[string]string),
+				StatusCode: http.StatusOK,
 			}, nil
 		}
 	}

@@ -18,17 +18,21 @@ func TestErrorResponse_render(t *testing.T) {
 
 	zl := zerolog.New(io.Discard).With()
 
+	responseHeaders := map[string]string{"x-frame-options": "DENY", "x-content-type-options": "nosniff"}
+
 	tests := []struct {
-		name           string
-		accept         string
-		expectedStatus int
-		expectedBody   string
+		name            string
+		accept          string
+		expectedStatus  int
+		expectedBody    string
+		expectedHeaders map[string]string
 	}{
 		{
-			name:           "happy path",
-			accept:         "application/json",
-			expectedStatus: http.StatusBadRequest,
-			expectedBody:   `{"error_code":"test_render","error_msg":"test error user"}`,
+			name:            "happy path",
+			accept:          "application/json",
+			expectedStatus:  http.StatusBadRequest,
+			expectedBody:    `{"error_code":"test_render","error_msg":"test error user"}`,
+			expectedHeaders: responseHeaders,
 		},
 	}
 
@@ -43,10 +47,11 @@ func TestErrorResponse_render(t *testing.T) {
 			nr := httptest.NewRecorder()
 
 			her := &ErrorResponse{
-				Error:          fmt.Errorf("test render"),
-				HTTPStatusCode: http.StatusBadRequest,
-				ErrorCode:      "test_render",
-				ErrorMsg:       "test error user",
+				Error:      fmt.Errorf("test render"),
+				Headers:    responseHeaders,
+				StatusCode: http.StatusBadRequest,
+				ErrorCode:  "test_render",
+				ErrorMsg:   "test error user",
 			}
 
 			logger := zl.Logger()
@@ -66,6 +71,14 @@ func TestErrorResponse_render(t *testing.T) {
 				t.Errorf("expected response header %s, got %s", tt.accept, resp.Header.Get("Content-Type"))
 
 				return
+			}
+
+			for header, headerValue := range tt.expectedHeaders {
+				if resp.Header.Get(header) != headerValue {
+					t.Errorf("expected response header %s: %s, got %s: %s", header, headerValue, header, resp.Header.Get(header))
+
+					return
+				}
 			}
 
 			body, _ := io.ReadAll(resp.Body)
@@ -92,10 +105,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 	testErr := errors.New("test render")
 
 	refE := &ErrorResponse{
-		Error:          testErr,
-		HTTPStatusCode: http.StatusBadRequest,
-		ErrorCode:      "test_render",
-		ErrorMsg:       "test error user",
+		Error:      testErr,
+		StatusCode: http.StatusBadRequest,
+		ErrorCode:  "test_render",
+		ErrorMsg:   "test error user",
 	}
 
 	type args struct {
@@ -112,10 +125,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "equal",
 			args: args{
 				e1: &ErrorResponse{
-					Error:          testErr,
-					HTTPStatusCode: http.StatusBadRequest,
-					ErrorCode:      "test_render",
-					ErrorMsg:       "test error user",
+					Error:      testErr,
+					StatusCode: http.StatusBadRequest,
+					ErrorCode:  "test_render",
+					ErrorMsg:   "test error user",
 				},
 			},
 			want: true,
@@ -124,10 +137,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "diff error",
 			args: args{
 				e1: &ErrorResponse{
-					Error:          fmt.Errorf("diff"),
-					HTTPStatusCode: http.StatusBadRequest,
-					ErrorCode:      "test_render",
-					ErrorMsg:       "test error user",
+					Error:      fmt.Errorf("diff"),
+					StatusCode: http.StatusBadRequest,
+					ErrorCode:  "test_render",
+					ErrorMsg:   "test error user",
 				},
 			},
 			want: false,
@@ -136,10 +149,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "diff http status code",
 			args: args{
 				e1: &ErrorResponse{
-					Error:          testErr,
-					HTTPStatusCode: http.StatusInternalServerError,
-					ErrorCode:      "test_render",
-					ErrorMsg:       "test error user",
+					Error:      testErr,
+					StatusCode: http.StatusInternalServerError,
+					ErrorCode:  "test_render",
+					ErrorMsg:   "test error user",
 				},
 			},
 			want: false,
@@ -148,10 +161,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "diff error code",
 			args: args{
 				e1: &ErrorResponse{
-					Error:          testErr,
-					HTTPStatusCode: http.StatusBadRequest,
-					ErrorCode:      "diff",
-					ErrorMsg:       "test error user",
+					Error:      testErr,
+					StatusCode: http.StatusBadRequest,
+					ErrorCode:  "diff",
+					ErrorMsg:   "test error user",
 				},
 			},
 			want: false,
@@ -160,10 +173,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "diff error msg",
 			args: args{
 				e1: &ErrorResponse{
-					Error:          testErr,
-					HTTPStatusCode: http.StatusBadRequest,
-					ErrorCode:      "test_render",
-					ErrorMsg:       "diff",
+					Error:      testErr,
+					StatusCode: http.StatusBadRequest,
+					ErrorCode:  "test_render",
+					ErrorMsg:   "diff",
 				},
 			},
 			want: false,
@@ -237,10 +250,10 @@ func TestInternalServerError_ToErrorResponse(t *testing.T) {
 			name:   "happy path",
 			fields: fields{Err: testErr},
 			want: &ErrorResponse{
-				Error:          InternalServerError{Err: testErr},
-				HTTPStatusCode: http.StatusInternalServerError,
-				ErrorCode:      "internal_error",
-				ErrorMsg:       "internal error",
+				Error:      InternalServerError{Err: testErr},
+				StatusCode: http.StatusInternalServerError,
+				ErrorCode:  "internal_error",
+				ErrorMsg:   "internal error",
 			},
 		},
 	}
@@ -312,10 +325,10 @@ func TestNotFoundError_ToErrorResponse(t *testing.T) {
 			name:   "happy path",
 			fields: fields{Designation: "v"},
 			want: &ErrorResponse{
-				Error:          NotFoundError{Designation: "v"},
-				HTTPStatusCode: http.StatusNotFound,
-				ErrorCode:      "not_found",
-				ErrorMsg:       "no corresponding `v` has been found",
+				Error:      NotFoundError{Designation: "v"},
+				StatusCode: http.StatusNotFound,
+				ErrorCode:  "not_found",
+				ErrorMsg:   "no corresponding `v` has been found",
 			},
 		},
 	}
@@ -331,6 +344,61 @@ func TestNotFoundError_ToErrorResponse(t *testing.T) {
 
 			if got := e.ToErrorResponse(); !got.IsEqual(tt.want) {
 				t.Errorf("NotFoundError.ToErrorResponse() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestErrorResponse_AddHeaders(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name            string
+		headers         map[string]string
+		newHeaders      map[string]string
+		expectedHeaders map[string]string
+	}{
+		{
+			name:            "all new headers",
+			headers:         map[string]string{"elle": "a"},
+			newHeaders:      map[string]string{"il": "a"},
+			expectedHeaders: map[string]string{"elle": "a", "il": "a"},
+		},
+		{
+			name:            "overwrite headers",
+			headers:         map[string]string{"elle": "a"},
+			newHeaders:      map[string]string{"elle": "b"},
+			expectedHeaders: map[string]string{"elle": "b"},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			her := &ErrorResponse{
+				Headers: tt.headers,
+			}
+
+			her.AddHeaders(tt.newHeaders)
+
+			if len(her.Headers) != len(tt.expectedHeaders) {
+				t.Errorf("wrong headers = %v, want %v", her.Headers, tt.expectedHeaders)
+			}
+
+			// check if all headers have the right value and are here
+			for k, v := range tt.expectedHeaders {
+				foundV, ok := her.Headers[k]
+				if !ok {
+					t.Errorf("header %s expected but not found", k)
+
+					return
+				}
+
+				if foundV != v {
+					t.Errorf("header %s has value %s, exected %s", k, foundV, v)
+				}
 			}
 		})
 	}

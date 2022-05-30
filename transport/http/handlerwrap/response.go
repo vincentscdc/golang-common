@@ -8,15 +8,16 @@ import (
 
 // Response is a wrapper for the response body.
 type Response struct {
-	Body           any
-	HTTPStatusCode int
+	Headers    map[string]string
+	Body       any
+	StatusCode int
 }
 
 func (hr *Response) render(log *zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
 	render(
 		log,
-		req.Header.Get("Accept"),
-		hr.HTTPStatusCode,
+		hr.Headers,
+		hr.StatusCode,
 		hr.Body,
 		respW,
 	)

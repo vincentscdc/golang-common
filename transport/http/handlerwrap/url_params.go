@@ -20,10 +20,10 @@ func (e MissingParamError) Error() string {
 
 func (e MissingParamError) ToErrorResponse() *ErrorResponse {
 	return &ErrorResponse{
-		Error:          e,
-		HTTPStatusCode: http.StatusBadRequest,
-		ErrorCode:      "missing_param_error",
-		ErrorMsg:       e.Error(),
+		Error:      e,
+		StatusCode: http.StatusBadRequest,
+		ErrorCode:  "missing_param_error",
+		ErrorMsg:   e.Error(),
 	}
 }
 
@@ -39,9 +39,9 @@ func (e ParsingParamError) Error() string {
 
 func (e ParsingParamError) ToErrorResponse() *ErrorResponse {
 	return &ErrorResponse{
-		Error:          e,
-		HTTPStatusCode: http.StatusBadRequest,
-		ErrorCode:      "parsing_param_error",
-		ErrorMsg:       e.Error(),
+		Error:      e,
+		StatusCode: http.StatusBadRequest,
+		ErrorCode:  "parsing_param_error",
+		ErrorMsg:   e.Error(),
 	}
 }

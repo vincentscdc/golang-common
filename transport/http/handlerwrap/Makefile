@@ -26,8 +26,9 @@ bench-compare: ## compare benchs results
 # lint #
 ########
 
-lint: ## launch lints
-	golangci-lint run ./... --config=./.golangci.toml
+lint: ## lints the entire codebase
+	golangci-lint run ./... --config=./.golangci.toml && \
+	if [ $$(gofumpt -e -l ./ | wc -l) == "0" ] ; then exit 0; else exit 1; fi
 
 #######
 # sec #

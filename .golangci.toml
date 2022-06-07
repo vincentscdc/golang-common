@@ -48,7 +48,7 @@ enable = [
     "godox",
     "goerr113",
     "gofmt",
-    "gofumpt",
+    # "gofumpt", does not run properly: https://github.com/golangci/golangci-lint/issues/2711
     "goheader",
     "goimports",
     # "golint", deprecated

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/monacohq/golang-common/config/secrets/common"
-	"github.com/pelletier/go-toml"
+	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
 

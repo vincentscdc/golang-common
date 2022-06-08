@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [monitoring/otelinit/v1.0.2] - 2022-06-08
+
+### Chore
+
+- Update deps
+
+### Style
+
+- Update golangci-lint config
+- Remove unused godot linter setting
+- Adapt to new golangci lint
+- Add gofumpt separately
+
 ## [monitoring/otelinit/v1.0.1] - 2022-05-11
 
 ### Chore

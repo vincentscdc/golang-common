@@ -8,6 +8,7 @@ common golang packages used at crypto.com
 |---|---|---|---|
 | transport/http/handlewrap   | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |
 | monitoring/otelinit         | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/monitoring_otelinit.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/monitoring_otelinit.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |
+| config/secrets         | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/config_secrets.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/config_secrets.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/config/secrets) |
 
 ## How to use any of these private modules
 

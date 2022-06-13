@@ -172,7 +172,7 @@ func TestNewSecretUrnFromConfig(t *testing.T) {
 		},
 		{
 			name: "NewSecretUrnFromConfig2",
-			inputConfig: &common.SecretesConfigAWS{
+			inputConfig: &common.SecretsConfigAWS{
 				SecretID: testSecID,
 			},
 			expectError: true, // haven't mocked aws here so it will error trying to get a real secret

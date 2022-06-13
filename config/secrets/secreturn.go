@@ -38,7 +38,7 @@ func NewSecretUrnFromConfig(config common.SecretsConfig) (SecretUrn, error) {
 	switch config.(type) {
 	case *common.SecretsConfigLocal:
 		provider = local.NewFromConfig(config)
-	case *common.SecretesConfigAWS:
+	case *common.SecretsConfigAWS:
 		provider = awssm.NewFromConfig(config, awssm.ClientImpl{})
 	default:
 		return nil, common.SecretProviderUnknownError(config.Name())

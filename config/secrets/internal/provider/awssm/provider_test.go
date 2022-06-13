@@ -151,9 +151,9 @@ func TestGetSecretValue(t *testing.T) {
 func TestNewFromConfig(t *testing.T) {
 	t.Parallel()
 
-	awsSecretsConfigTest1 := &common.SecretesConfigAWS{}
+	awsSecretsConfigTest1 := &common.SecretsConfigAWS{}
 
-	awsSecretsConfigInvalidTest2 := common.SecretesConfigAWS{}
+	awsSecretsConfigInvalidTest2 := common.SecretsConfigAWS{}
 	cases := []struct {
 		name           string
 		config         common.SecretsConfig
@@ -236,7 +236,7 @@ func TestGetSecret(t *testing.T) {
 
 	secIDTest1 := "secret0"
 	secIDTest1Values := `{"k3":"v3", "k4":"v4"}`
-	awsSecretsConfigTest1 := &common.SecretesConfigAWS{
+	awsSecretsConfigTest1 := &common.SecretsConfigAWS{
 		SecretID: secIDTest1,
 	}
 
@@ -345,7 +345,7 @@ func TestGetSecret(t *testing.T) {
 func TestUnmarshal(t *testing.T) {
 	t.Parallel()
 
-	awsSecretsConfigTest1 := &common.SecretesConfigAWS{}
+	awsSecretsConfigTest1 := &common.SecretsConfigAWS{}
 	secIDTest1Values := `{"k3":"v3", "k4":"v4"}`
 	secIDTest1InvalidValues := `abc`
 
@@ -392,7 +392,7 @@ func TestUnmarshal(t *testing.T) {
 func TestLoadDefaultConfig(t *testing.T) {
 	t.Parallel()
 
-	awsSecretsConfigTest1 := &common.SecretesConfigAWS{}
+	awsSecretsConfigTest1 := &common.SecretsConfigAWS{}
 
 	cases := []struct {
 		name        string

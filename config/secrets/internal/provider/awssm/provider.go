@@ -35,13 +35,13 @@ type Client interface {
 type ClientImpl struct{}
 
 type SecretsProvider struct {
-	config    *common.SecretesConfigAWS
+	config    *common.SecretsConfigAWS
 	awsConfig aws.Config
 	Client
 }
 
 func NewFromConfig(sconfig common.SecretsConfig, client Client) *SecretsProvider {
-	scAws, ok := sconfig.(*common.SecretesConfigAWS)
+	scAws, ok := sconfig.(*common.SecretsConfigAWS)
 	if !ok {
 		return nil
 	}

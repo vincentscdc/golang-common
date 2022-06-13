@@ -20,10 +20,10 @@ const (
 	SecretsTOML = "toml"
 )
 
-type SecretesConfigAWS struct {
+type SecretsConfigAWS struct {
 	SecretID string
 }
 
-func (SecretesConfigAWS) Name() string {
+func (SecretsConfigAWS) Name() string {
 	return "AWS secrets manager"
 }

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### Bug Fixes
+
+- Fix config name typo ([#14](https://github.com/orhun/git-cliff/issues/14))
+
 ### Features
 
 - Config secrets ([#3](https://github.com/orhun/git-cliff/issues/3))

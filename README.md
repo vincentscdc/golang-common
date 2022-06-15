@@ -1,14 +1,14 @@
-# golang-common [![Coverage Status](https://coveralls.io/repos/github/monacohq/golang-common/badge.svg?t=cPxXZ8)](https://coveralls.io/github/monacohq/golang-common)
+# golang-common [![CircleCI](https://circleci.com/gh/monacohq/golang-common/tree/main.svg?style=shield&circle-token=daf1da839b5c2715ecf6e86532718dd83c4e5ca1)](https://circleci.com/gh/monacohq/golang-common/tree/main)[![Coverage Status](https://coveralls.io/repos/github/monacohq/golang-common/badge.svg?t=cPxXZ8)](https://coveralls.io/github/monacohq/golang-common)
 
 common golang packages used at crypto.com
 
 ## Current modules
 
-| module                      | version | audit | benchmarks |
-|---|---|---|---|
-| transport/http/handlewrap   | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/transport_http_handlewrap.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |
-| monitoring/otelinit         | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/monitoring_otelinit.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/monitoring_otelinit.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |
-| config/secrets         | | [![audit](https://github.com/monacohq/golang-common/actions/workflows/config_secrets.audit.yml/badge.svg)](https://github.com/monacohq/golang-common/actions/workflows/config_secrets.audit.yml) | [benches](https://turbo-winner-7f9425af.pages.github.io/config/secrets) |
+| module                      | benchmarks |
+|---|---|
+| [transport/http/handlewrap](transport/http/handlewrap) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |
+| [monitoring/otelinit](monitoring/otelinit) | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |
+| [config/secrets](config/secrets) | [benches](https://turbo-winner-7f9425af.pages.github.io/config/secrets) |
 
 ## How to use any of these private modules
 
@@ -47,8 +47,8 @@ Let's take an example of an opentelemetry module.
 
 **IMPORTANT** Note the folder and subfolders in the tag.
 
-- Make sure to add your workflows inside the root .github/workflows directory, with a name that makes sense
-  - beware of your action name
+- Make sure to add your workflows. Currently we use both [CircleCI](https://circleci.com) and Github actions to process CI. CircleCI is responsible for basic workflows such as lint, security scan, test, and coverage reporting. Github actions run benchmarks and refreshes the gh-pages automatically based on performance evaluation. Please place your workflow in `.circleci/config_package.yml` and `.github/workflows` respectively, with a name that makes sense
+  - beware of your workflow name as well as the job name
   - beware of your "on" triggers
   - beware of the necessary working_directories, related to your module
 

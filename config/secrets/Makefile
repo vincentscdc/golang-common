@@ -11,7 +11,7 @@ MOD_NAME="config/secrets"
 ########
 
 test: ## launch tests for a specific module
-	go test ./... -cover
+	go test -v ./... -cover -covermode=atomic -coverprofile=./coverage.out
 
 # test-leak: ## launch tests for a specific module with leak detection (if enabled)
 # 	go test ./ -leak

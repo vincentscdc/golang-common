@@ -1,4 +1,4 @@
-name: "Audit transport/http/handlerwrap"
+name: "Bench transport/http/handlerwrap"
 
 on:
   push:
@@ -12,40 +12,7 @@ on:
       - '.github/workflows/**'
     branches: [ main ]
 
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Run linters
-        uses: golangci/golangci-lint-action@v3
-        with:
-          working-directory: transport/http/handlerwrap
-          version: v1.46
-          args: --config=./.golangci.toml
-  sec-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Checkout code
-        uses: actions/checkout@v3               
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL'    
+jobs: 
   benchmark:
     name: Performance regression check
     runs-on: ubuntu-latest

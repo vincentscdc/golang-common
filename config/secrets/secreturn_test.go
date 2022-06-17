@@ -216,37 +216,20 @@ func TestSecretsBind(t *testing.T) {
 
 	cases := []struct {
 		name           string
+		testUrn        SecretUrn
 		testStruct     interface{}
 		expectError    bool
 		expectedStruct *SampleStruct
 	}{
 		{
 			name:        "non pointer struct",
+			testUrn:     SecretUrn{},
 			testStruct:  struct{}{},
 			expectError: true,
 		},
 		{
-			name:        "struct with different types",
-			testStruct:  &SampleStruct{},
-			expectError: false,
-			expectedStruct: &SampleStruct{
-				ItemBool:        true,
-				ItemInt:         1234,
-				ItemString:      "1234",
-				ItemFloat64:     12.34,
-				ItemIntSlice:    []int{1, 2, 3, 4},
-				ItemStringSlice: []string{"1", "2", "3", "4"},
-			},
-		},
-	}
-
-	for _, tC := range cases {
-		tC := tC
-
-		t.Run(tC.name, func(t *testing.T) {
-			t.Parallel()
-
-			secretUrn := SecretUrn{
+			name: "struct with different types",
+			testUrn: SecretUrn{
 				"item_bool":                   true,
 				"item_int":                    1234,
 				"item_string":                 "1234",
@@ -261,9 +244,54 @@ func TestSecretsBind(t *testing.T) {
 				"item_intslice_err_type_1":    1,
 				"item_stringslice_err_type":   []int{1, 2, 3, 4},
 				"item_stringslice_err_type_1": 1,
-			}
+			},
+			testStruct:  &SampleStruct{},
+			expectError: false,
+			expectedStruct: &SampleStruct{
+				ItemBool:        true,
+				ItemInt:         1234,
+				ItemString:      "1234",
+				ItemFloat64:     12.34,
+				ItemIntSlice:    []int{1, 2, 3, 4},
+				ItemStringSlice: []string{"1", "2", "3", "4"},
+			},
+		},
+		{
+			name: "struct with different types",
+			testUrn: SecretUrn{
+				"item_bool":    "true",
+				"item_int":     "1234",
+				"item_string":  "1234",
+				"item_float64": "12.34",
+				// "item_intslice":               []int{1, 2, 3, 4},
+				// "item_stringslice":            []string{"1", "2", "3", "4"},
+				// "item_bool_err_type":          "true",
+				// "item_int_err_type":           12.34,
+				// "item_string_err_type":        1234,
+				// "item_float64_err_type":       1234,
+				// "item_intslice_err_type":      []string{"1", "2", "3", "4"},
+				// "item_intslice_err_type_1":    1,
+				// "item_stringslice_err_type":   []int{1, 2, 3, 4},
+				// "item_stringslice_err_type_1": 1,
+			},
+			testStruct:  &SampleStruct{},
+			expectError: false,
+			expectedStruct: &SampleStruct{
+				ItemBool:    true,
+				ItemInt:     1234,
+				ItemString:  "1234",
+				ItemFloat64: 12.34,
+			},
+		},
+	}
 
-			err := secretUrn.Bind(tC.testStruct)
+	for _, tC := range cases {
+		tC := tC
+
+		t.Run(tC.name, func(t *testing.T) {
+			t.Parallel()
+
+			err := tC.testUrn.Bind(tC.testStruct)
 
 			if tC.expectError && err == nil {
 				t.Fatalf("expected error, got none")

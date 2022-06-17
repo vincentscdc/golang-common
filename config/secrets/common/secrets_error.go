@@ -4,6 +4,15 @@ import (
 	"fmt"
 )
 
+type SecretValueCastError struct {
+	Val string
+	Err error
+}
+
+func (s SecretValueCastError) Error() string {
+	return fmt.Sprintf("secret value casting (%s) error: %v", s.Val, s.Err)
+}
+
 type SecretValueTypeError struct{}
 
 func (SecretValueTypeError) Error() string {

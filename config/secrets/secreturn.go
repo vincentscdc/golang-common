@@ -3,6 +3,8 @@ package secrets
 import (
 	"errors"
 	"fmt"
+	"reflect"
+	"strconv"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/monacohq/golang-common/config/secrets/common"
@@ -17,8 +19,9 @@ type SecretUrn map[string]any
 // Bind unmarshalls the secret items into a user-defined structure
 func (sm SecretUrn) Bind(v any) error {
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		TagName: "secret_key",
-		Result:  v,
+		TagName:    "secret_key",
+		DecodeHook: decodeHook,
+		Result:     v,
 	})
 	if err != nil {
 		return fmt.Errorf("new decoder error: %w", err)
@@ -29,6 +32,29 @@ func (sm SecretUrn) Bind(v any) error {
 	}
 
 	return nil
+}
+
+// decodeHook uses reflection to automatically use helpers to transform values when mapping
+func decodeHook(fromType, toType reflect.Type, value interface{}) (interface{}, error) {
+	if fromType.Kind() == reflect.String {
+		stringValue, ok := value.(string)
+		if !ok {
+			return 0, common.SecretValueTypeError{}
+		}
+
+		switch {
+		case toType.Kind() == reflect.Int:
+			return castStringToInt(stringValue)
+		case toType.Kind() == reflect.Bool:
+			return castStringToBool(stringValue)
+		case toType.Kind() == reflect.Float64:
+			return castStringToFloat64(stringValue)
+		default:
+			return value, nil
+		}
+	}
+
+	return value, nil
 }
 
 // NewSecretUrnFromConfig returns SecretUrn from a SecreteConfig provided by the caller
@@ -193,6 +219,35 @@ func castToStringSlice(v any) ([]string, error) {
 	}
 
 	return sliceString, nil
+}
+
+func castStringToInt(v string) (int, error) {
+	result, err := strconv.Atoi(v)
+	if err != nil {
+		return 0, common.SecretValueCastError{Val: v, Err: err}
+	}
+
+	return result, nil
+}
+
+func castStringToBool(v string) (bool, error) {
+	result, err := strconv.ParseBool(v)
+	if err != nil {
+		return false, common.SecretValueCastError{Val: v, Err: err}
+	}
+
+	return result, nil
+}
+
+func castStringToFloat64(v string) (float64, error) {
+	const bitsInt64 = 64
+
+	result, err := strconv.ParseFloat(v, bitsInt64)
+	if err != nil {
+		return 0, common.SecretValueCastError{Val: v, Err: err}
+	}
+
+	return result, nil
 }
 
 func (sm SecretUrn) IsSecretSet(key string) bool {

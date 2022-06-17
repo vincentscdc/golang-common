@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 ### Features
 
 - Config secrets ([#3](https://github.com/orhun/git-cliff/issues/3))
+- Migration to CircleCI ([#12](https://github.com/orhun/git-cliff/issues/12))
+- Reflection binding ([#18](https://github.com/orhun/git-cliff/issues/18))
 
 ### Miscellaneous Tasks
 

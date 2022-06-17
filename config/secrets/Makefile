@@ -72,7 +72,7 @@ release-tag:
 # changelog #
 #############
 
-MESSAGE_CHANGELOG_COMMIT="update CHANGELOG.md for $(MOD_VERSION)"
+MESSAGE_CHANGELOG_COMMIT="docs: update CHANGELOG.md for $(MOD_VERSION)"
 
 changelog-gen: 
 	@git cliff \

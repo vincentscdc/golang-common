@@ -46,7 +46,7 @@ func NewFromConfig(sconfig common.SecretsConfig, client Client) *SecretsProvider
 		return nil
 	}
 
-	awsConfig, err := client.LoadDefaultConfig(context.TODO())
+	awsConfig, err := client.LoadDefaultConfig(context.TODO(), config.WithRegion(scAws.Region))
 	if err != nil {
 		return nil
 	}

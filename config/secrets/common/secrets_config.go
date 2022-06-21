@@ -22,6 +22,7 @@ const (
 
 type SecretsConfigAWS struct {
 	SecretID string `yaml:"secret_id" json:"secret_id" toml:"secret_id"`
+	Region   string `yaml:"region" json:"region" toml:"region"`
 }
 
 func (SecretsConfigAWS) Name() string {

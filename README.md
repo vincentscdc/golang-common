@@ -1,4 +1,4 @@
-# golang-common [![CircleCI](https://circleci.com/gh/monacohq/golang-common/tree/main.svg?style=shield&circle-token=daf1da839b5c2715ecf6e86532718dd83c4e5ca1)](https://circleci.com/gh/monacohq/golang-common/tree/main)[![Coverage Status](https://coveralls.io/repos/github/monacohq/golang-common/badge.svg?t=cPxXZ8)](https://coveralls.io/github/monacohq/golang-common)
+# golang-common [![CircleCI](https://circleci.com/gh/monacohq/golang-common/tree/main.svg?style=shield&circle-token=daf1da839b5c2715ecf6e86532718dd83c4e5ca1)](https://circleci.com/gh/monacohq/golang-common/tree/main) [![Coverage Status](https://coveralls.io/repos/github/monacohq/golang-common/badge.svg?t=cPxXZ8)](https://coveralls.io/github/monacohq/golang-common)
 
 common golang packages used at crypto.com
 

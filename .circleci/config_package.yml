@@ -18,6 +18,9 @@ parameters:
   trigger-config-secrets:
     type: boolean
     default: false
+  trigger-database-pginit:
+    type: boolean
+    default: false
 
 executors:
   default-executor:
@@ -27,6 +30,11 @@ executors:
   go-executor:
     docker:
       - image: cimg/go:1.18
+    working_directory: << pipeline.parameters.workspace_directory >>
+  test-executor:
+    machine:
+      image: ubuntu-2204:2022.04.1
+      docker_layer_caching: true
     working_directory: << pipeline.parameters.workspace_directory >>
 
 commands:
@@ -92,7 +100,7 @@ jobs:
       working_directory:
         type: string
         description: "working directory to execute test"
-    executor: go-executor
+    executor: test-executor
     steps:
       - checkout
       - run: go mod download
@@ -108,7 +116,7 @@ jobs:
       working_directory:
         type: string
         description: "working directory to execute coverage"
-    executor: go-executor
+    executor: test-executor
     steps:
       - checkout
       - run: go mod download
@@ -182,6 +190,22 @@ workflows:
           requires:
             - linter-config-secrets
 
+  audit-database-pginit:
+    when:
+      or: [<<pipeline.parameters.trigger-database-pginit>>, <<pipeline.parameters.trigger-all>>]
+    jobs:
+      - linter:
+          name: linter-database-pginit
+          working_directory: "database/pginit"
+      - sec-scan:
+          name: sec-scan-database-pginit
+          working_directory: "database/pginit"
+      - test:
+          name: test-database-pginit
+          working_directory: "database/pginit"
+          requires:
+            - linter-database-pginit
+
   coverage-all:
     jobs:
       - coverage:
@@ -193,8 +217,12 @@ workflows:
       - coverage:
           name: coverage-config-secrets
           working_directory: "config/secrets"
+      - coverage:
+          name: coverage-database-pginit
+          working_directory: "database/pginit"
       - coverage-finish:
           requires:
             - coverage-transport-http-handlewrap
             - coverage-monitoring-otelinit
             - coverage-config-secrets
+            - coverage-database-pginit

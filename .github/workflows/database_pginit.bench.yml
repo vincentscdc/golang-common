@@ -1,0 +1,53 @@
+name: "Bench database/pginit"
+
+on:
+  push:
+    paths:
+      - 'database/pginit/**'
+      - '.github/workflows/**'
+    branches: [ main ]
+  pull_request:
+    paths:
+      - 'database/pginit/**'
+      - '.github/workflows/**'
+    branches: [ main ]
+
+jobs:
+  benchmark:
+    name: Performance regression check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Checkout code
+        uses: actions/checkout@v3  
+      # Run benchmark with `go test -bench` and stores the output to a file
+      - name: Run benchmark
+        working-directory: database/pginit
+        run: |
+          go test ./... -bench=. -benchmem | tee ./bench-continuous.txt
+      # Download previous benchmark result from cache (if exists)
+      - name: Download previous benchmark data
+        uses: actions/cache@v3
+        with:
+          path: ./cache/database/pginit
+          key: ${{ runner.os }}-benchmark
+      # Run `github-action-benchmark` action
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'go'
+          output-file-path: ./database/pginit/bench-continuous.txt
+          # Workflow will fail when an alert happens
+          fail-on-alert: true
+          # GitHub API token to make a commit comment
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Enable alert commit comment
+          comment-on-alert: true         
+          benchmark-data-dir-path: ./database/pginit/
+          # When cache is used
+          # external-data-json-path: ./cache/database/pginit/benchmark-data.json
+          # Push and deploy GitHub pages branch automatically
+          auto-push: true 

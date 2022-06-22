@@ -1,6 +1,7 @@
 package local
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -15,6 +16,8 @@ type SecretsProvider struct {
 	config *common.SecretsConfigLocal
 }
 
+var _ common.Provider = (*SecretsProvider)(nil)
+
 func NewFromConfig(config common.SecretsConfig) *SecretsProvider {
 	localConfig, ok := config.(*common.SecretsConfigLocal)
 	if !ok {
@@ -26,7 +29,7 @@ func NewFromConfig(config common.SecretsConfig) *SecretsProvider {
 	}
 }
 
-func (p *SecretsProvider) GetSecret() (map[string]any, error) {
+func (p *SecretsProvider) GetSecret(ctx context.Context) (map[string]any, error) {
 	return readSecretsConfig(p.config.Path)
 }
 

@@ -1,6 +1,7 @@
 package secrets
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -59,25 +60,25 @@ func decodeHook(fromType, toType reflect.Type, value interface{}) (interface{}, 
 
 // NewSecretUrnFromConfig returns SecretUrn from a SecreteConfig provided by the caller
 // It is used for internal providers from this library core.
-func NewSecretUrnFromConfig(config common.SecretsConfig) (SecretUrn, error) {
-	var provider Provider
+func NewSecretUrnFromConfig(ctx context.Context, config common.SecretsConfig) (SecretUrn, error) {
+	var provider common.Provider
 	switch config.(type) {
 	case *common.SecretsConfigLocal:
 		provider = local.NewFromConfig(config)
 	case *common.SecretsConfigAWS:
-		provider = awssm.NewFromConfig(config, awssm.ClientImpl{})
+		provider = awssm.NewFromConfig(ctx, config, awssm.ClientImpl{})
 	default:
 		return nil, common.SecretProviderUnknownError(config.Name())
 	}
 
-	return NewSecretUrnFromProvider(provider)
+	return NewSecretUrnFromProvider(ctx, provider)
 }
 
 // NewSecretUrnFromProvider returns SecretUrn from a customized provider by the caller
 // It is used for external providers which can be a customized one from the caller.
 // The external provider must be enforced to implement the Provider interface.
-func NewSecretUrnFromProvider(provider Provider) (SecretUrn, error) {
-	secretValue, err := provider.GetSecret()
+func NewSecretUrnFromProvider(ctx context.Context, provider common.Provider) (SecretUrn, error) {
+	secretValue, err := provider.GetSecret(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("retrieve secrets from provider error: %w", err)
 	}

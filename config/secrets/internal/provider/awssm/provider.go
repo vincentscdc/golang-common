@@ -40,13 +40,15 @@ type SecretsProvider struct {
 	Client
 }
 
-func NewFromConfig(sconfig common.SecretsConfig, client Client) *SecretsProvider {
+var _ common.Provider = (*SecretsProvider)(nil)
+
+func NewFromConfig(ctx context.Context, sconfig common.SecretsConfig, client Client) *SecretsProvider {
 	scAws, ok := sconfig.(*common.SecretsConfigAWS)
 	if !ok {
 		return nil
 	}
 
-	awsConfig, err := client.LoadDefaultConfig(context.TODO(), config.WithRegion(scAws.Region))
+	awsConfig, err := client.LoadDefaultConfig(ctx, config.WithRegion(scAws.Region))
 	if err != nil {
 		return nil
 	}
@@ -60,7 +62,7 @@ func NewFromConfig(sconfig common.SecretsConfig, client Client) *SecretsProvider
 	return secretManager
 }
 
-func (p *SecretsProvider) GetSecret() (map[string]any, error) {
+func (p *SecretsProvider) GetSecret(ctx context.Context) (map[string]any, error) {
 	client := secretsmanager.NewFromConfig(p.awsConfig)
 	secretID := p.config.SecretID
 

@@ -1,6 +1,7 @@
 package secrets
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/monacohq/golang-common/config/secrets/common"
@@ -11,7 +12,9 @@ func Example_localSecrets() {
 		Path: "example/local_secrets_example.yaml",
 	}
 
-	sm, err := NewSecretUrnFromConfig(localConfig)
+	ctx := context.Background()
+
+	sm, err := NewSecretUrnFromConfig(ctx, localConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +40,9 @@ func Example_localSecrets_with_struct() {
 		ItemStringSlice []string `secret_key:"item_stringslice"`
 	}
 
-	sm, err := NewSecretUrnFromConfig(&common.SecretsConfigLocal{
+	ctx := context.Background()
+
+	sm, err := NewSecretUrnFromConfig(ctx, &common.SecretsConfigLocal{
 		Path: "example/local_secrets_example.yaml",
 	})
 	if err != nil {

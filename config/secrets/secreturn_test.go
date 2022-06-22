@@ -1,6 +1,7 @@
 package secrets
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -12,7 +13,7 @@ func BenchmarkGetLocalSecrets(b *testing.B) {
 		Path: "example/local_secrets_example.yaml",
 	}
 
-	provider, err := NewSecretUrnFromConfig(localConfig)
+	provider, err := NewSecretUrnFromConfig(context.TODO(), localConfig)
 	if err != nil {
 		return
 	}
@@ -31,7 +32,7 @@ func TestGetSecretType(t *testing.T) {
 		Path: "example/local_secrets_example.yaml",
 	}
 
-	provider, err := NewSecretUrnFromConfig(localConfig)
+	provider, err := NewSecretUrnFromConfig(context.TODO(), localConfig)
 	if err != nil {
 		t.Fatalf("expect nil got %v", err)
 	}
@@ -68,7 +69,7 @@ func TestGetSecretItemNotFound(t *testing.T) {
 		Path: "example/local_secrets_example.yaml",
 	}
 
-	provider, err := NewSecretUrnFromConfig(localConfig)
+	provider, err := NewSecretUrnFromConfig(context.TODO(), localConfig)
 	if err != nil {
 		t.Fatalf("expect nil got %v", err)
 	}
@@ -109,7 +110,7 @@ func TestGetSecretItemErrType(t *testing.T) {
 		Path: "example/local_secrets_example.yaml",
 	}
 
-	provider, err := NewSecretUrnFromConfig(localConfig)
+	provider, err := NewSecretUrnFromConfig(context.TODO(), localConfig)
 	if err != nil {
 		t.Fatalf("expect nil got %v", err)
 	}
@@ -190,7 +191,7 @@ func TestNewSecretUrnFromConfig(t *testing.T) {
 		t.Run(tC.name, func(t *testing.T) {
 			t.Parallel()
 
-			_, err := NewSecretUrnFromConfig(tC.inputConfig)
+			_, err := NewSecretUrnFromConfig(context.TODO(), tC.inputConfig)
 
 			if tC.expectError == false && err != nil {
 				t.Fatalf("expect %v, got %v", tC.expectError, err)
@@ -315,7 +316,7 @@ func BenchmarkSecretsBind(b *testing.B) {
 		Path: "example/local_secrets_example.yaml",
 	}
 
-	secretUrn, err := NewSecretUrnFromConfig(localConfig)
+	secretUrn, err := NewSecretUrnFromConfig(context.TODO(), localConfig)
 	if err != nil {
 		return
 	}

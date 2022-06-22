@@ -220,7 +220,9 @@ func TestNewFromConfig(t *testing.T) {
 		t.Run(tC.name, func(t *testing.T) {
 			t.Parallel()
 
-			testConfig := NewFromConfig(tC.config, tC.client(t))
+			ctx := context.TODO()
+
+			testConfig := NewFromConfig(ctx, tC.config, tC.client(t))
 			if tC.expectedConfig == nil && testConfig != nil {
 				t.Fatalf("expect %v, got %v", tC.expectedConfig, testConfig)
 			}
@@ -333,8 +335,10 @@ func TestGetSecret(t *testing.T) {
 		t.Run(tC.name, func(t *testing.T) {
 			t.Parallel()
 
-			testSecretsProvider := NewFromConfig(awsSecretsConfigTest1, tC.client(t))
-			secretValues, err := testSecretsProvider.GetSecret()
+			ctx := context.TODO()
+
+			testSecretsProvider := NewFromConfig(ctx, awsSecretsConfigTest1, tC.client(t))
+			secretValues, err := testSecretsProvider.GetSecret(ctx)
 			if (tC.expectGetSecretValueError == false && err == nil) && (!reflect.DeepEqual(tC.expectedSecretValues, secretValues)) {
 				t.Fatalf("expect %v, got %v", tC.expectedSecretValues, secretValues)
 			}
@@ -378,7 +382,9 @@ func TestUnmarshal(t *testing.T) {
 		t.Run(tC.name, func(t *testing.T) {
 			t.Parallel()
 
-			testSecretsProvider := NewFromConfig(awsSecretsConfigTest1, ClientImpl{})
+			ctx := context.TODO()
+
+			testSecretsProvider := NewFromConfig(ctx, awsSecretsConfigTest1, ClientImpl{})
 			var output map[string]any
 			err := testSecretsProvider.Unmarshal([]byte(tC.input), &output)
 
@@ -421,7 +427,9 @@ func TestLoadDefaultConfig(t *testing.T) {
 		t.Run(tC.name, func(t *testing.T) {
 			t.Parallel()
 
-			testSecretsProvider := NewFromConfig(awsSecretsConfigTest1, ClientImpl{})
+			ctx := context.TODO()
+
+			testSecretsProvider := NewFromConfig(ctx, awsSecretsConfigTest1, ClientImpl{})
 
 			_, err := testSecretsProvider.LoadDefaultConfig(context.TODO(), tC.input)
 

@@ -15,7 +15,9 @@ import "github.com/monacohq/golang-common/config/secrets"
 		Path: "example/local_secrets_example.yaml",
 	}
 
-	sm, err := NewSecretUrnFromConfig(localConfig)
+	ctx := context.Background()
+
+	sm, err := NewSecretUrnFromConfig(ctx, localConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +55,9 @@ import "github.com/monacohq/golang-common/config/secrets"
 		ItemStringSlice []string `secret_key:"item_stringslice"`
 	}
 
-	sm, err := NewSecretUrnFromConfig(&common.SecretsConfigLocal{
+	ctx := context.Background()
+
+	sm, err := NewSecretUrnFromConfig(ctx, &common.SecretsConfigLocal{
 		Path: "example/local_secrets_example.yaml",
 	})
 	if err != nil {
@@ -81,11 +85,10 @@ import "github.com/monacohq/golang-common/config/secrets"
 
 ## Index
 
-- [type Provider](<#type-provider>)
 - [type SecretUrn](<#type-secreturn>)
-  - [func NewSecretUrnFromConfig(config common.SecretsConfig) (*SecretUrn, error)](<#func-newsecreturnfromconfig>)
-  - [func NewSecretUrnFromProvider(provider Provider) (*SecretUrn, error)](<#func-newsecreturnfromprovider>)
-  - [func (sm *SecretUrn) Bind(v any) error](<#func-secreturn-bind>)
+  - [func NewSecretUrnFromConfig(ctx context.Context, config common.SecretsConfig) (SecretUrn, error)](<#func-newsecreturnfromconfig>)
+  - [func NewSecretUrnFromProvider(ctx context.Context, provider common.Provider) (SecretUrn, error)](<#func-newsecreturnfromprovider>)
+  - [func (sm SecretUrn) Bind(v any) error](<#func-secreturn-bind>)
   - [func (sm SecretUrn) GetSecretBool(key string) (bool, error)](<#func-secreturn-getsecretbool>)
   - [func (sm SecretUrn) GetSecretFloat64(key string) (float64, error)](<#func-secreturn-getsecretfloat64>)
   - [func (sm SecretUrn) GetSecretInt(key string) (int, error)](<#func-secreturn-getsecretint>)
@@ -95,15 +98,7 @@ import "github.com/monacohq/golang-common/config/secrets"
   - [func (sm SecretUrn) IsSecretSet(key string) bool](<#func-secreturn-issecretset>)
 
 
-## type [Provider](<https://github.com/monacohq/golang-common/blob/main/config/secrets/provider.go#L3-L5>)
-
-```go
-type Provider interface {
-    GetSecret() (map[string]any, error)
-}
-```
-
-## type [SecretUrn](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L15>)
+## type [SecretUrn](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L18>)
 
 SecretUrn will retrieve secrets from a secrets provider
 
@@ -111,67 +106,67 @@ SecretUrn will retrieve secrets from a secrets provider
 type SecretUrn map[string]any
 ```
 
-### func [NewSecretUrnFromConfig](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L36>)
+### func [NewSecretUrnFromConfig](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L63>)
 
 ```go
-func NewSecretUrnFromConfig(config common.SecretsConfig) (*SecretUrn, error)
+func NewSecretUrnFromConfig(ctx context.Context, config common.SecretsConfig) (SecretUrn, error)
 ```
 
 NewSecretUrnFromConfig returns SecretUrn from a SecreteConfig provided by the caller It is used for internal providers from this library core\.
 
-### func [NewSecretUrnFromProvider](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L53>)
+### func [NewSecretUrnFromProvider](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L80>)
 
 ```go
-func NewSecretUrnFromProvider(provider Provider) (*SecretUrn, error)
+func NewSecretUrnFromProvider(ctx context.Context, provider common.Provider) (SecretUrn, error)
 ```
 
 NewSecretUrnFromProvider returns SecretUrn from a customized provider by the caller It is used for external providers which can be a customized one from the caller\. The external provider must be enforced to implement the Provider interface\.
 
-### func \(\*SecretUrn\) [Bind](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L18>)
+### func \(SecretUrn\) [Bind](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L21>)
 
 ```go
-func (sm *SecretUrn) Bind(v any) error
+func (sm SecretUrn) Bind(v any) error
 ```
 
 Bind unmarshalls the secret items into a user\-defined structure
 
-### func \(SecretUrn\) [GetSecretBool](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L74>)
+### func \(SecretUrn\) [GetSecretBool](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L99>)
 
 ```go
 func (sm SecretUrn) GetSecretBool(key string) (bool, error)
 ```
 
-### func \(SecretUrn\) [GetSecretFloat64](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L91>)
+### func \(SecretUrn\) [GetSecretFloat64](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L116>)
 
 ```go
 func (sm SecretUrn) GetSecretFloat64(key string) (float64, error)
 ```
 
-### func \(SecretUrn\) [GetSecretInt](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L108>)
+### func \(SecretUrn\) [GetSecretInt](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L133>)
 
 ```go
 func (sm SecretUrn) GetSecretInt(key string) (int, error)
 ```
 
-### func \(SecretUrn\) [GetSecretIntSlice](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L125>)
+### func \(SecretUrn\) [GetSecretIntSlice](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L150>)
 
 ```go
 func (sm SecretUrn) GetSecretIntSlice(key string) ([]int, error)
 ```
 
-### func \(SecretUrn\) [GetSecretString](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L154>)
+### func \(SecretUrn\) [GetSecretString](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L179>)
 
 ```go
 func (sm SecretUrn) GetSecretString(key string) (string, error)
 ```
 
-### func \(SecretUrn\) [GetSecretStringSlice](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L171>)
+### func \(SecretUrn\) [GetSecretStringSlice](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L196>)
 
 ```go
 func (sm SecretUrn) GetSecretStringSlice(key string) ([]string, error)
 ```
 
-### func \(SecretUrn\) [IsSecretSet](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L200>)
+### func \(SecretUrn\) [IsSecretSet](<https://github.com/monacohq/golang-common/blob/main/config/secrets/secreturn.go#L254>)
 
 ```go
 func (sm SecretUrn) IsSecretSet(key string) bool

@@ -1,6 +1,7 @@
 package local
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
@@ -33,7 +34,7 @@ func TestGetSecret(t *testing.T) {
 		},
 	}
 
-	secretValue, err := provider.GetSecret()
+	secretValue, err := provider.GetSecret(context.TODO())
 	if err == nil {
 		t.Fatalf("expect non-nil")
 	}
@@ -70,7 +71,7 @@ func TestGetSecretFromUnknownFormat(t *testing.T) {
 
 	e := common.SecretFileFormatError("unknown")
 
-	if _, err := sm.GetSecret(); err == nil || !errors.Is(err, e) {
+	if _, err := sm.GetSecret(context.TODO()); err == nil || !errors.Is(err, e) {
 		t.Fatalf("expect %v got %v", e, err)
 	}
 }
@@ -85,7 +86,7 @@ func TestGetSecretFromYAML(t *testing.T) {
 	}
 
 	{
-		secretValue, err := provider.GetSecret()
+		secretValue, err := provider.GetSecret(context.TODO())
 		if err != nil {
 			t.Fatalf("expect nil got %v", err)
 		}
@@ -106,7 +107,7 @@ func TestGetSecretFromJSON(t *testing.T) {
 	}
 
 	{
-		secretValue, err := provider.GetSecret()
+		secretValue, err := provider.GetSecret(context.TODO())
 		if err != nil {
 			t.Fatalf("expect nil got %v", err)
 		}
@@ -127,7 +128,7 @@ func TestGetSecretFromTOML(t *testing.T) {
 	}
 
 	{
-		secretValue, err := provider.GetSecret()
+		secretValue, err := provider.GetSecret(context.TODO())
 		if err != nil {
 			t.Fatalf("expect nil got %v", err)
 		}
@@ -147,7 +148,7 @@ func TestGetSecretFromFileWithoutExtension(t *testing.T) {
 		},
 	}
 
-	if _, err := provider.GetSecret(); err == nil {
+	if _, err := provider.GetSecret(context.TODO()); err == nil {
 		t.Fatalf("expect err")
 	}
 }

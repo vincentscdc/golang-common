@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 - Update deps for otelinit
 
+### Docs
+
+- Changelog commit
+
 ### Feat
 
 - Migration to CircleCI (#12)

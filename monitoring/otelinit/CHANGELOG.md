@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [monitoring/otelinit/v1.0.3] - 2022-06-22
+
+### Chore
+
+- Update deps for otelinit
+
+### Feat
+
+- Migration to CircleCI (#12)
+
 ## [monitoring/otelinit/v1.0.2] - 2022-06-08
 
 ### Chore

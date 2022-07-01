@@ -12,6 +12,9 @@ parameters:
   trigger-transport-http-handlerwrap:
     type: boolean
     default: false
+  trigger-transport-http-middleware-cryptouseruuid:
+    type: boolean
+    default: false
   trigger-monitoring-otelinit:
     type: boolean
     default: false
@@ -158,6 +161,22 @@ workflows:
           requires:
             - linter-transport-http-handlerwrap
 
+  audit-transport-http-middleware-cryptouseruuid:
+    when:
+      or: [<<pipeline.parameters.trigger-transport-http-middleware-cryptouseruuid>>, <<pipeline.parameters.trigger-all>>]
+    jobs:
+      - linter:
+          name: linter-transport-http-middleware-cryptouseruuid
+          working_directory: "transport/http/middleware/cryptouseruuid"
+      - sec-scan:
+          name: sec-scan-transport-http-middleware-cryptouseruuid
+          working_directory: "transport/http/middleware/cryptouseruuid"
+      - test:
+          name: test-transport-http-middleware-cryptouseruuid
+          working_directory: "transport/http/middleware/cryptouseruuid"
+          requires:
+            - linter-transport-http-middleware-cryptouseruuid
+
   audit-monitoring-otelinit:
     when:
       or: [<<pipeline.parameters.trigger-monitoring-otelinit>>, <<pipeline.parameters.trigger-all>>]
@@ -212,6 +231,9 @@ workflows:
           name: coverage-transport-http-handlewrap
           working_directory: "transport/http/handlerwrap"
       - coverage:
+          name: coverage-transport-http-middleware-cryptouseruuid
+          working_directory: "transport/http/middleware/cryptouseruuid"
+      - coverage:
           name: coverage-monitoring-otelinit
           working_directory: "monitoring/otelinit"
       - coverage:
@@ -223,6 +245,7 @@ workflows:
       - coverage-finish:
           requires:
             - coverage-transport-http-handlewrap
+            - coverage-transport-http-middleware-cryptouseruuid
             - coverage-monitoring-otelinit
             - coverage-config-secrets
             - coverage-database-pginit

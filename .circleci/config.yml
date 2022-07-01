@@ -18,6 +18,7 @@ workflows:
           mapping: |
             .circleci/.* trigger-all true
             transport/http/handlerwrap/.* trigger-transport-http-handlerwrap true
+            transport/http/middleware/cryptouseruuid/.* trigger-transport-http-middleware-cryptouseruuid true
             monitoring/otelinit/.* trigger-monitoring-otelinit true
             config/secrets/.* trigger-config-secrets true
             database/pginit/.* trigger-database-pginit true

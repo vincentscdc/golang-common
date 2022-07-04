@@ -6,9 +6,11 @@ import (
 	"net"
 	"time"
 
+	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/log/zerologadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/monacohq/golang-common/database/pginit/ext/decimal/ericlagergren"
 	"github.com/rs/zerolog"
 )
 
@@ -111,6 +113,22 @@ func WithLogLevel(zLvl zerolog.Level) Option {
 			pgi.logLvl = pgx.LogLevelError
 		case zLvl == zerolog.NoLevel:
 			pgi.logLvl = pgx.LogLevelNone
+		}
+
+		pgi.pgxConf.ConnConfig.LogLevel = pgi.logLvl
+	}
+}
+
+func WithDecimalType() Option {
+	return func(p *PGInit) {
+		p.pgxConf.AfterConnect = func(ctx context.Context, c *pgx.Conn) error {
+			c.ConnInfo().RegisterDataType(pgtype.DataType{
+				Value: &ericlagergren.Numeric{},
+				Name:  "numeric",
+				OID:   pgtype.NumericOID,
+			})
+
+			return nil
 		}
 	}
 }

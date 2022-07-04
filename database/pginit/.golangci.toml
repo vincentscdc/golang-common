@@ -138,4 +138,15 @@ extra-rules = true
 
 [[issues.exclude-rules]]
 path = '(.+)_test\.go'
-linters = ["funlen", "goconst", "interfacer", "dupl", "lll", "goerr113", "varnamelen", "errcheck"]
+linters = [
+    "funlen",
+    "goconst",
+    "interfacer",
+    "dupl",
+    "lll",
+    "goerr113",
+    "varnamelen",
+    "errcheck",
+    "cyclop",
+    "gocognit",
+]

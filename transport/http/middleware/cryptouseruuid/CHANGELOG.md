@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [transport/http/middleware/cryptouseruuid/v1.0.0] - 2022-07-04
+
+### Chore
+
+- Update CHANGELOG.md for transport/http/middleware/cryptouseruuid/v1.0.0
+- Docs, go.mod, makefile
 
 ### Feat
 

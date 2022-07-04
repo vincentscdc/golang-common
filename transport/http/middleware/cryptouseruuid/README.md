@@ -9,8 +9,13 @@ import "github.com/monacohq/golang-common/transport/http/middleware/cryptouseruu
 ## Index
 
 - [Constants](<#constants>)
-- [Variables](<#variables>)
+- [func GetUserUUID(ctx context.Context) (*uuid.UUID, error)](<#func-getuseruuid>)
+- [func SetUserUUID(ctx context.Context, userUUID *uuid.UUID) context.Context](<#func-setuseruuid>)
 - [func UserUUID(log *zerolog.Logger) func(http.Handler) http.Handler](<#func-useruuid>)
+- [type UserIDNotFoundError](<#type-useridnotfounderror>)
+  - [func (m UserIDNotFoundError) Error() string](<#func-useridnotfounderror-error>)
+- [type UserUUIDInvalidError](<#type-useruuidinvaliderror>)
+  - [func (m UserUUIDInvalidError) Error() string](<#func-useruuidinvaliderror-error>)
 
 
 ## Constants
@@ -21,19 +26,51 @@ const (
 )
 ```
 
-## Variables
+## func [GetUserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L74>)
 
 ```go
-var ErrUserIDNotFound = errors.New("user id not found")
+func GetUserUUID(ctx context.Context) (*uuid.UUID, error)
 ```
 
-## func [UserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L28>)
+## func [SetUserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L70>)
+
+```go
+func SetUserUUID(ctx context.Context, userUUID *uuid.UUID) context.Context
+```
+
+## func [UserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L38>)
 
 ```go
 func UserUUID(log *zerolog.Logger) func(http.Handler) http.Handler
 ```
 
 UserUUID is a middleware to get the user uuid from HTTP header\. Set it into ctx otherwise abort with a 401 HTTP status code
+
+## type [UserIDNotFoundError](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L22>)
+
+```go
+type UserIDNotFoundError struct{}
+```
+
+### func \(UserIDNotFoundError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L24>)
+
+```go
+func (m UserIDNotFoundError) Error() string
+```
+
+## type [UserUUIDInvalidError](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L28-L30>)
+
+```go
+type UserUUIDInvalidError struct {
+    // contains filtered or unexported fields
+}
+```
+
+### func \(UserUUIDInvalidError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L32>)
+
+```go
+func (m UserUUIDInvalidError) Error() string
+```
 
 
 

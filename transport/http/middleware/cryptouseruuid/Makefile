@@ -71,7 +71,7 @@ MESSAGE_CHANGELOG_COMMIT="chore(changelog): update CHANGELOG.md for $(MOD_VERSIO
 changelog-gen: 
 	@git cliff \
 		--include-path "**/$(MOD_NAME)/*" \
-		--repository ../../ \
+		--repository ../../../../ \
 		-o ./CHANGELOG.md && \
 	printf "\nchangelog generated!\n"
 

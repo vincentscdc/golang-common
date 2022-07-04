@@ -3,7 +3,6 @@ module github.com/monacohq/golang-common/transport/http/middleware/cryptouseruui
 go 1.18
 
 require (
-	github.com/go-chi/chi/v5 v5.0.7
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/monacohq/golang-common/transport/http/handlerwrap v1.1.0
 	github.com/rs/zerolog v1.27.0

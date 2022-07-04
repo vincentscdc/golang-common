@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/gofrs/uuid"
 	"github.com/monacohq/golang-common/transport/http/handlerwrap"
 	"github.com/rs/zerolog"
@@ -76,18 +75,14 @@ func Test_UserUUID(t *testing.T) {
 			var logMsg bytes.Buffer
 			log := zerolog.New(&logMsg)
 
-			r := chi.NewRouter()
-			r.Use(UserUUID(&log))
-			r.Get("/", tt.args.handler)
-
-			srv := httptest.NewServer(r)
-			defer srv.Close()
-
 			req := httptest.NewRequest("GET", "/", nil)
 			req.Header.Set(HTTPHeaderKeyUserUUID, tt.args.userUUID)
 			rr := httptest.NewRecorder()
 
-			r.ServeHTTP(rr, req)
+			userUUID := UserUUID(&log)
+
+			handler := userUUID(tt.args.handler)
+			handler.ServeHTTP(rr, req)
 
 			if status := rr.Code; status != tt.expectedHTTPStatusCode {
 				t.Errorf("handler returned wrong status code: got %v want %v",
@@ -98,10 +93,6 @@ func Test_UserUUID(t *testing.T) {
 				t.Errorf("handler returned unexpected body: got %v want %v",
 					rr.Body.String(), tt.expectedBody)
 			}
-
-			//if strings.TrimSpace(logMsg.String()) != tt.expectedLogMsg {
-			//	t.Errorf("handler log unexpected log message: got %v want %v", logMsg.String(), tt.expectedLogMsg)
-			//}
 		})
 	}
 }

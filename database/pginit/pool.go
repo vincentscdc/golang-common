@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgtype"
+	gofrs "github.com/jackc/pgtype/ext/gofrs-uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/log/zerologadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -124,6 +125,20 @@ func WithDecimalType() Option {
 		p.pgxConf.AfterConnect = func(ctx context.Context, c *pgx.Conn) error {
 			c.ConnInfo().RegisterDataType(pgtype.DataType{
 				Value: &ericlagergren.Numeric{},
+				Name:  "numeric",
+				OID:   pgtype.NumericOID,
+			})
+
+			return nil
+		}
+	}
+}
+
+func WithUUIDType() Option {
+	return func(p *PGInit) {
+		p.pgxConf.AfterConnect = func(ctx context.Context, c *pgx.Conn) error {
+			c.ConnInfo().RegisterDataType(pgtype.DataType{
+				Value: &gofrs.UUID{},
 				Name:  "numeric",
 				OID:   pgtype.NumericOID,
 			})

@@ -96,6 +96,7 @@ default LogLevel = Warn
 
 - [type Config](<#type-config>)
 - [type Option](<#type-option>)
+  - [func WithDecimalType() Option](<#func-withdecimaltype>)
   - [func WithLogLevel(zLvl zerolog.Level) Option](<#func-withloglevel>)
   - [func WithLogger(logger *zerolog.Logger, reqIDKeyFromCtx string) Option](<#func-withlogger>)
 - [type PGInit](<#type-pginit>)
@@ -120,7 +121,7 @@ type Config struct {
 }
 ```
 
-## type [Option](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L22>)
+## type [Option](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L24>)
 
 Option configures PGInit behaviour\.
 
@@ -128,7 +129,13 @@ Option configures PGInit behaviour\.
 type Option func(*PGInit)
 ```
 
-### func [WithLogLevel](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L101>)
+### func [WithDecimalType](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L122>)
+
+```go
+func WithDecimalType() Option
+```
+
+### func [WithLogLevel](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L103>)
 
 ```go
 func WithLogLevel(zLvl zerolog.Level) Option
@@ -136,7 +143,7 @@ func WithLogLevel(zLvl zerolog.Level) Option
 
 WithLogLevel set pgx log level\.
 
-### func [WithLogger](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L85>)
+### func [WithLogger](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L87>)
 
 ```go
 func WithLogger(logger *zerolog.Logger, reqIDKeyFromCtx string) Option
@@ -144,7 +151,7 @@ func WithLogger(logger *zerolog.Logger, reqIDKeyFromCtx string) Option
 
 WithLogger Add logger to pgx\. if the request context contains request id\, can pass in the request id context key to reqIDKeyFromCtx and logger will log with the request id\. Only will log if the log level is equal and above pgx\.LogLevelWarn\.
 
-## type [PGInit](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L25-L28>)
+## type [PGInit](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L27-L30>)
 
 PGInit provides capabilities for connect to postgres with pgx\.pool\.
 
@@ -154,7 +161,7 @@ type PGInit struct {
 }
 ```
 
-### func [New](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L32>)
+### func [New](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L34>)
 
 ```go
 func New(conf *Config, opts ...Option) (*PGInit, error)
@@ -162,7 +169,7 @@ func New(conf *Config, opts ...Option) (*PGInit, error)
 
 New initializes a PGInit using the provided Config and options\. If opts is not provided it will initializes PGInit with default configuration\.
 
-### func \(\*PGInit\) [ConnPool](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L73>)
+### func \(\*PGInit\) [ConnPool](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L75>)
 
 ```go
 func (pgi *PGInit) ConnPool(ctx context.Context) (*pgxpool.Pool, error)

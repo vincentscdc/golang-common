@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Updgrade deps
 - Update deps
 - Docs, go.mod, makefile
+- Update CHANGELOG.md for transport/http/handlerwrap/v2.0.2
 
 ### Docs
 
@@ -21,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Add headers in handlerwrap response and errorresponse (#8)
 - Migration to CircleCI (#12)
 - Uuid middleware integration (#36)
+- Add support for middleware cryptouseruuid
 
 ### Fix
 

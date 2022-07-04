@@ -257,6 +257,7 @@ func TestConnPoolWithLogger(t *testing.T) {
 				WithLogLevel(tt.lvl),
 				WithLogger(&zerolog.Logger{}, "request-id"),
 				WithDecimalType(),
+				WithUUIDType(),
 			)
 			if err != nil {
 				t.Error("expected no error")

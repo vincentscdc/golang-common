@@ -205,3 +205,52 @@ func Test_getUserUUID(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkUserUUID(b *testing.B) {
+	uuid := "b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5"
+
+	f := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	var logMsg bytes.Buffer
+	log := zerolog.New(&logMsg)
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	req.Header.Set(HTTPHeaderKeyUserUUID, uuid)
+
+	userUUID := UserUUID(&log)
+
+	handler := userUUID(f)
+
+	b.ResetTimer()
+
+	for i := 0; i <= b.N; i++ {
+		handler.ServeHTTP(rr, req)
+	}
+}
+
+func BenchmarkSetUserUUID(b *testing.B) {
+	ctx := context.Background()
+	userUUID, _ := uuid.NewV4()
+
+	b.ResetTimer()
+
+	for i := 0; i <= b.N; i++ {
+		ctx = setUserUUID(ctx, &userUUID)
+	}
+}
+
+func BenchmarkGetUserUUID(b *testing.B) {
+	userUUID, _ := uuid.NewV4()
+
+	ctx := context.WithValue(context.Background(), contextValKeyUserUUID, userUUID)
+
+	b.ResetTimer()
+
+	for i := 0; i <= b.N; i++ {
+		getUserUUID(ctx)
+	}
+}

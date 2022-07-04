@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/goccy/go-json v0.9.8
-	github.com/monacohq/golang-common/transport/http/middleware/cryptouseruuid v0.0.0-20220704084327-20797f612010
+	github.com/monacohq/golang-common/transport/http/middleware/cryptouseruuid v1.0.0
 	github.com/rs/zerolog v1.27.0
 )
 

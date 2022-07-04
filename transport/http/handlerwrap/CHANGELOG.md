@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - Updgrade deps
 - Update deps
+- Docs, go.mod, makefile
 
 ### Docs
 
@@ -18,6 +19,8 @@ All notable changes to this project will be documented in this file.
 
 - Add otelinit and http handlerwrap
 - Add headers in handlerwrap response and errorresponse (#8)
+- Migration to CircleCI (#12)
+- Uuid middleware integration (#36)
 
 ### Fix
 

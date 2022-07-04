@@ -262,18 +262,42 @@ func TestTypeDecode(t *testing.T) {
 	}{
 		{"bool", refv.FieldByName("Bool"), true, true},
 		{"string", refv.FieldByName("String"), "hello world", "hello world"},
-		{"int", refv.FieldByName("Int"), float64(1 << 32), int(float64(1 << 32))},
-		{"int8", refv.FieldByName("Int8"), float64(1<<7 - 1), int8(float64(1<<7 - 1))},
-		{"int16", refv.FieldByName("Int16"), float64(1<<15 - 1), int16(float64(1<<15 - 1))},
-		{"int32", refv.FieldByName("Int32"), float64(1<<31 - 1), int32(float64(1<<31 - 1))},
-		{"int64", refv.FieldByName("Int64"), float64(1 << 32), int64(float64(1 << 32))},
-		{"uint", refv.FieldByName("Uint"), float64(1 << 32), uint(float64(1 << 32))},
-		{"uint8", refv.FieldByName("Uint8"), float64(1<<8 - 1), uint8(float64(1<<8 - 1))},
-		{"uint16", refv.FieldByName("Uint16"), float64(1<<16 - 1), uint16(float64(1<<16 - 1))},
-		{"uint32", refv.FieldByName("Uint32"), float64(1<<32 - 1), uint32(float64(1<<32 - 1))},
-		{"uint64", refv.FieldByName("Uint64"), float64(uint64(1) << 63), uint64(float64(uint64(1) << 63))},
-		{"float32", refv.FieldByName("Float32"), float64(123), float32(123)},
-		{"float64", refv.FieldByName("Float64"), float64(123), float64(123)},
+		{"int->int", refv.FieldByName("Int"), 123, 123},
+		{"uint->int", refv.FieldByName("Int"), uint(123), int(123)},
+		{"float->int", refv.FieldByName("Int"), float64(123), int(float64(123))},
+		{"int->int8", refv.FieldByName("Int8"), 123, int8(123)},
+		{"uint->int8", refv.FieldByName("Int8"), uint(123), int8(123)},
+		{"float->int8", refv.FieldByName("Int8"), float64(123), int8(123)},
+		{"int->int16", refv.FieldByName("Int16"), 123, int16(123)},
+		{"uint->int16", refv.FieldByName("Int16"), uint(123), int16(123)},
+		{"float->int16", refv.FieldByName("Int16"), float64(123), int16(123)},
+		{"int->int32", refv.FieldByName("Int32"), 123, int32(123)},
+		{"uint->int32", refv.FieldByName("Int32"), uint(123), int32(123)},
+		{"float->int32", refv.FieldByName("Int32"), float64(123), int32(123)},
+		{"int->int64", refv.FieldByName("Int64"), 123, int64(123)},
+		{"uint->int64", refv.FieldByName("Int64"), uint(123), int64(123)},
+		{"float->int64", refv.FieldByName("Int64"), float64(123), int64(123)},
+		{"uint->uint", refv.FieldByName("Uint"), uint(123), uint(123)},
+		{"int->uint", refv.FieldByName("Uint"), int(123), uint(123)},
+		{"float->uint", refv.FieldByName("Uint"), float64(123), uint(123)},
+		{"uint->uint8", refv.FieldByName("Uint8"), uint(123), uint8(123)},
+		{"int->uint8", refv.FieldByName("Uint8"), int(123), uint8(123)},
+		{"float->uint8", refv.FieldByName("Uint8"), float64(123), uint8(123)},
+		{"uint->uint16", refv.FieldByName("Uint16"), uint(123), uint16(123)},
+		{"int->uint16", refv.FieldByName("Uint16"), int(123), uint16(123)},
+		{"float64->uint16", refv.FieldByName("Uint16"), float64(123), uint16(123)},
+		{"uint->uint32", refv.FieldByName("Uint32"), uint(123), uint32(123)},
+		{"int->uint32", refv.FieldByName("Uint32"), int(123), uint32(123)},
+		{"float->uint32", refv.FieldByName("Uint32"), float64(123), uint32(123)},
+		{"uint->uint64", refv.FieldByName("Uint64"), uint(123), uint64(123)},
+		{"int->uint64", refv.FieldByName("Uint64"), 123, uint64(123)},
+		{"float->uint64", refv.FieldByName("Uint64"), float64(123), uint64(123)},
+		{"int->float32", refv.FieldByName("Float32"), 123, float32(123)},
+		{"uint->float32", refv.FieldByName("Float32"), uint(123), float32(123)},
+		{"float->float32", refv.FieldByName("Float32"), float64(123), float32(123)},
+		{"int->float64", refv.FieldByName("Float64"), 123, float64(123)},
+		{"uint->float64", refv.FieldByName("Float64"), uint(123), float64(123)},
+		{"float->float64", refv.FieldByName("Float64"), float64(123), float64(123)},
 	}
 
 	decoder := &Decoder{}
@@ -302,7 +326,9 @@ func TestTypeDecodeOverflow(t *testing.T) {
 		Int8  int8
 		Int16 int16
 		Int32 int32
+		Int64 int64
 
+		Uint   uint
 		Uint8  uint8
 		Uint16 uint16
 		Uint32 uint32
@@ -317,12 +343,16 @@ func TestTypeDecodeOverflow(t *testing.T) {
 		field reflect.Value
 		value any
 	}{
-		{"int8", refv.FieldByName("Int8"), float64(1 << 7)},
-		{"int16", refv.FieldByName("Int16"), float64(1 << 15)},
-		{"int32", refv.FieldByName("Int32"), float64(1 << 31)},
-		{"uint8", refv.FieldByName("Uint8"), float64(1 << 8)},
-		{"uint16", refv.FieldByName("Uint16"), float64(1 << 16)},
-		{"uint32", refv.FieldByName("Uint32"), float64(1 << 32)},
+		{"int8", refv.FieldByName("Int8"), 1 << 7},
+		{"int16", refv.FieldByName("Int16"), 1 << 15},
+		{"int32", refv.FieldByName("Int32"), 1 << 31},
+		{"uint64->int64", refv.FieldByName("Int64"), uint64(1) << 63},
+		{"float->int64", refv.FieldByName("Int64"), math.MaxFloat64},
+		{"uint8", refv.FieldByName("Uint8"), 1 << 8},
+		{"uint16", refv.FieldByName("Uint16"), 1 << 16},
+		{"uint32", refv.FieldByName("Uint32"), 1 << 32},
+		{"negative->uint", refv.FieldByName("Uint"), -1},
+		{"float->uint", refv.FieldByName("Uint"), math.MaxFloat64},
 		{"float32", refv.FieldByName("Float32"), math.MaxFloat64},
 	}
 
@@ -379,17 +409,9 @@ func TestTyepDecodeTypeMismatch(t *testing.T) {
 	s := struct {
 		Bool bool
 
-		Int   int
-		Int8  int8
-		Int16 int16
-		Int32 int32
-		Int64 int64
+		Int int
 
-		Uint   uint
-		Uint8  uint8
-		Uint16 uint16
-		Uint32 uint32
-		Uint64 uint64
+		Uint uint
 
 		Float32 float32
 	}{}
@@ -402,18 +424,13 @@ func TestTyepDecodeTypeMismatch(t *testing.T) {
 		val   any
 		exp   error
 	}{
-		{"bool", refv.FieldByName("Bool"), 1, ValueTypeMismatchError{"", refv.FieldByName("Bool").Type().Name(), "int"}},
-		{"int", refv.FieldByName("Int"), 1, ValueTypeMismatchError{"", refv.FieldByName("Int").Type().Name(), "int"}},
-		{"int8", refv.FieldByName("Int8"), int8(1), ValueTypeMismatchError{"", refv.FieldByName("Int8").Type().Name(), "int8"}},
-		{"int16", refv.FieldByName("Int16"), int16(1), ValueTypeMismatchError{"", refv.FieldByName("Int16").Type().Name(), "int16"}},
-		{"int32", refv.FieldByName("Int32"), int32(1), ValueTypeMismatchError{"", refv.FieldByName("Int32").Type().Name(), "int32"}},
-		{"int64", refv.FieldByName("Int64"), int64(1), ValueTypeMismatchError{"", refv.FieldByName("Int64").Type().Name(), "int64"}},
-		{"uint", refv.FieldByName("Uint"), uint(1), ValueTypeMismatchError{"", refv.FieldByName("Uint").Type().Name(), "uint"}},
-		{"uint8", refv.FieldByName("Uint8"), uint8(1), ValueTypeMismatchError{"", refv.FieldByName("Uint8").Type().Name(), "uint8"}},
-		{"uint16", refv.FieldByName("Uint16"), uint16(1), ValueTypeMismatchError{"", refv.FieldByName("Uint16").Type().Name(), "uint16"}},
-		{"uint32", refv.FieldByName("Uint32"), uint32(1), ValueTypeMismatchError{"", refv.FieldByName("Uint32").Type().Name(), "uint32"}},
-		{"uint64", refv.FieldByName("Uint64"), uint64(1), ValueTypeMismatchError{"", refv.FieldByName("Uint64").Type().Name(), "uint64"}},
-		{"float32", refv.FieldByName("Float32"), float32(1), ValueTypeMismatchError{"", refv.FieldByName("Float32").Type().Name(), "float32"}},
+		{"int->bool", refv.FieldByName("Bool"), 1, ValueTypeMismatchError{"", refv.FieldByName("Bool").Type().Name(), "int"}},
+		{"bool->int", refv.FieldByName("Int"), true, ValueTypeMismatchError{"", refv.FieldByName("Int").Type().Name(), "bool"}},
+		{"string->int", refv.FieldByName("Int"), "string", ValueTypeMismatchError{"", refv.FieldByName("Int").Type().Name(), "string"}},
+		{"bool->uint", refv.FieldByName("Uint"), true, ValueTypeMismatchError{"", refv.FieldByName("Uint").Type().Name(), "bool"}},
+		{"string->uint", refv.FieldByName("Uint"), "string", ValueTypeMismatchError{"", refv.FieldByName("Uint").Type().Name(), "string"}},
+		{"bool->float", refv.FieldByName("Float32"), true, ValueTypeMismatchError{"", refv.FieldByName("Float32").Type().Name(), "bool"}},
+		{"string->float", refv.FieldByName("Float32"), "string", ValueTypeMismatchError{"", refv.FieldByName("Float32").Type().Name(), "string"}},
 	}
 
 	dec := &Decoder{}

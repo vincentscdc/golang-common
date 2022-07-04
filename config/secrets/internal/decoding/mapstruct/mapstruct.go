@@ -1,6 +1,7 @@
 package mapstruct
 
 import (
+	"math/big"
 	"reflect"
 )
 
@@ -133,16 +134,41 @@ func (d *Decoder) decodeBool(name string, field reflect.Value, val any) error {
 func (d *Decoder) decodeInt(name string, field reflect.Value, val any) error {
 	rvl := reflect.Indirect(reflect.ValueOf(val))
 
-	// unmarshalling JSON number into an interface will be stored as float64
-	if rvl.Kind() != reflect.Float64 {
+	var intval int64
+
+	// nolint:exhaustive // not listed types are not being supported
+	switch rvl.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		intval = rvl.Int()
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		val := rvl.Uint()
+		if val>>63 == 1 {
+			return OverflowError{
+				FieldName: name,
+				FieldType: field.Type().Name(),
+				ValueType: rvl.Type().Name(),
+			}
+		}
+
+		intval = int64(val)
+	case reflect.Float32, reflect.Float64:
+		val, accuracy := big.NewFloat(rvl.Float()).Int64()
+		if accuracy != big.Exact {
+			return OverflowError{
+				FieldName: name,
+				FieldType: field.Type().Name(),
+				ValueType: rvl.Type().Name(),
+			}
+		}
+
+		intval = val
+	default:
 		return ValueTypeMismatchError{
 			FieldName: name,
 			FieldType: field.Type().Name(),
 			ValueType: rvl.Type().Name(),
 		}
 	}
-
-	intval := int64(rvl.Float())
 
 	if field.OverflowInt(intval) {
 		return OverflowError{
@@ -160,8 +186,35 @@ func (d *Decoder) decodeInt(name string, field reflect.Value, val any) error {
 func (d *Decoder) decodeUint(name string, field reflect.Value, val any) error {
 	rvl := reflect.Indirect(reflect.ValueOf(val))
 
-	// unmarshalling JSON number into an interface will be stored as float64
-	if rvl.Kind() != reflect.Float64 {
+	var uintval uint64
+
+	// nolint:exhaustive // not listed types are not being supported
+	switch rvl.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		intval := rvl.Int()
+		if intval < 0 {
+			return OverflowError{
+				FieldName: name,
+				FieldType: field.Type().Name(),
+				ValueType: rvl.Type().Name(),
+			}
+		}
+
+		uintval = uint64(intval)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		uintval = rvl.Uint()
+	case reflect.Float32, reflect.Float64:
+		val, accuracy := big.NewFloat(rvl.Float()).Uint64()
+		if accuracy != big.Exact {
+			return OverflowError{
+				FieldName: name,
+				FieldType: field.Type().Name(),
+				ValueType: rvl.Type().Name(),
+			}
+		}
+
+		uintval = val
+	default:
 		return ValueTypeMismatchError{
 			FieldName: name,
 			FieldType: field.Type().Name(),
@@ -169,10 +222,7 @@ func (d *Decoder) decodeUint(name string, field reflect.Value, val any) error {
 		}
 	}
 
-	fval := rvl.Float()
-	uintval := uint64(fval)
-
-	if fval < 0 || field.OverflowUint(uintval) {
+	if field.OverflowUint(uintval) {
 		return OverflowError{
 			FieldName: name,
 			FieldType: field.Type().Name(),
@@ -188,8 +238,17 @@ func (d *Decoder) decodeUint(name string, field reflect.Value, val any) error {
 func (d *Decoder) decodeFloat(name string, field reflect.Value, val any) error {
 	rvl := reflect.Indirect(reflect.ValueOf(val))
 
-	// unmarshalling JSON number into an interface will be stored as float64
-	if rvl.Kind() != reflect.Float64 {
+	var floatval float64
+
+	// nolint:exhaustive // not listed types are not being supported
+	switch rvl.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		floatval = float64(rvl.Int())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		floatval = float64(rvl.Uint())
+	case reflect.Float32, reflect.Float64:
+		floatval = rvl.Float()
+	default:
 		return ValueTypeMismatchError{
 			FieldName: name,
 			FieldType: field.Type().Name(),
@@ -197,9 +256,7 @@ func (d *Decoder) decodeFloat(name string, field reflect.Value, val any) error {
 		}
 	}
 
-	fval := rvl.Float()
-
-	if field.OverflowFloat(fval) {
+	if field.OverflowFloat(floatval) {
 		return OverflowError{
 			FieldName: name,
 			FieldType: field.Type().Name(),
@@ -207,7 +264,7 @@ func (d *Decoder) decodeFloat(name string, field reflect.Value, val any) error {
 		}
 	}
 
-	field.SetFloat(fval)
+	field.SetFloat(floatval)
 
 	return nil
 }

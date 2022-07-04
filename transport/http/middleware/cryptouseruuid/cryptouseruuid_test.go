@@ -3,13 +3,13 @@ package cryptouseruuid
 import (
 	"bytes"
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/monacohq/golang-common/transport/http/handlerwrap"
 	"github.com/rs/zerolog"
 )
 
@@ -23,9 +23,9 @@ func Test_UserUUID(t *testing.T) {
 
 	echoHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		userID, err := getUserUUID(r.Context())
+		userID, err := GetUserUUID(r.Context())
 		if err != nil {
-			t.Fatalf("failed to get user uuid %v", err.Error)
+			t.Fatalf("failed to get user uuid %v", err.Error())
 		}
 		if _, err := w.Write([]byte(userID.String())); err != nil {
 			t.Fatalf("unexpected write into response error: %v", err)
@@ -37,7 +37,6 @@ func Test_UserUUID(t *testing.T) {
 		args                   args
 		expectedHTTPStatusCode int
 		expectedBody           string
-		expectedLogMsg         string
 	}{
 		{
 			name: "happy path",
@@ -62,7 +61,6 @@ func Test_UserUUID(t *testing.T) {
 				handler:  echoHandler,
 			},
 			expectedHTTPStatusCode: http.StatusUnauthorized,
-			expectedLogMsg:         `{"level":"error","error":"invalid UUID length: 3","UserID":"xxx","message":"invalid user id"}`,
 		},
 	}
 
@@ -97,7 +95,7 @@ func Test_UserUUID(t *testing.T) {
 	}
 }
 
-func Test_setUserUUID(t *testing.T) {
+func Test_SetUserUUID(t *testing.T) {
 	t.Parallel()
 
 	userUUID, _ := uuid.NewV4()
@@ -133,7 +131,7 @@ func Test_setUserUUID(t *testing.T) {
 				ctx = context.WithValue(context.Background(), contextValKeyUserUUID, tt.userUUID)
 			}
 
-			ctx = setUserUUID(ctx, tt.newUserUUID)
+			ctx = SetUserUUID(ctx, tt.newUserUUID)
 
 			if ctx.Value(contextValKeyUserUUID) != tt.want {
 				t.Errorf("wrong userUUID in context = %v, want %v", ctx.Value(contextValKeyUserUUID), tt.want)
@@ -142,7 +140,7 @@ func Test_setUserUUID(t *testing.T) {
 	}
 }
 
-func Test_getUserUUID(t *testing.T) {
+func Test_GetUserUUID(t *testing.T) {
 	t.Parallel()
 
 	userUUID, _ := uuid.NewV4()
@@ -151,7 +149,7 @@ func Test_getUserUUID(t *testing.T) {
 		name                  string
 		userUUID              any
 		expectedUserUUID      *uuid.UUID
-		expectedErrorResponse *handlerwrap.ErrorResponse
+		expectedErrorResponse error
 	}{
 		{
 			name:                  "happy path",
@@ -160,26 +158,16 @@ func Test_getUserUUID(t *testing.T) {
 			expectedErrorResponse: nil,
 		},
 		{
-			name:             "value is not uuid",
-			userUUID:         "test",
-			expectedUserUUID: nil,
-			expectedErrorResponse: &handlerwrap.ErrorResponse{
-				Error:      ErrUserIDNotFound,
-				StatusCode: http.StatusUnauthorized,
-				ErrorCode:  "",
-				ErrorMsg:   "user id not found",
-			},
+			name:                  "value is not uuid",
+			userUUID:              "test",
+			expectedUserUUID:      nil,
+			expectedErrorResponse: UserIDNotFoundError{},
 		},
 		{
-			name:             "user id not found",
-			userUUID:         nil,
-			expectedUserUUID: nil,
-			expectedErrorResponse: &handlerwrap.ErrorResponse{
-				Error:      ErrUserIDNotFound,
-				StatusCode: http.StatusUnauthorized,
-				ErrorCode:  "",
-				ErrorMsg:   "user id not found",
-			},
+			name:                  "user id not found",
+			userUUID:              nil,
+			expectedUserUUID:      nil,
+			expectedErrorResponse: UserIDNotFoundError{},
 		},
 	}
 
@@ -193,17 +181,51 @@ func Test_getUserUUID(t *testing.T) {
 				ctx = context.WithValue(context.Background(), contextValKeyUserUUID, tt.userUUID)
 			}
 
-			actualUserUUID, actualErr := getUserUUID(ctx)
+			actualUserUUID, actualErr := GetUserUUID(ctx)
 
 			if actualUserUUID != tt.expectedUserUUID {
 				t.Errorf("expected user uuid: %v, got %v", tt.expectedUserUUID, actualUserUUID)
 			}
 
-			if actualErr != nil && !actualErr.IsEqual(tt.expectedErrorResponse) {
+			if actualErr != nil && !errors.Is(actualErr, tt.expectedErrorResponse) {
 				t.Errorf("expected error: %v, got %v", tt.expectedErrorResponse, actualErr)
 			}
 		})
 	}
+}
+
+func Test_UUIDMiddlewareNotSet(t *testing.T) {
+	t.Parallel()
+
+	echoHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID, err := GetUserUUID(r.Context())
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+
+			return
+		}
+		if _, err := w.Write([]byte(userID.String())); err != nil {
+			t.Fatalf("unexpected write into response error: %v", err)
+		}
+
+		w.WriteHeader(http.StatusOK)
+	})
+
+	rr := httptest.NewRecorder()
+
+	req := httptest.NewRequest("GET", "/", nil)
+	setRequestHeaderUserID(req, uuid.Must(uuid.NewV4()).String())
+
+	echoHandler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusUnauthorized {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusUnauthorized)
+	}
+}
+
+func setRequestHeaderUserID(r *http.Request, uuid string) {
+	r.Header.Set(HTTPHeaderKeyUserUUID, uuid)
 }
 
 func BenchmarkUserUUID(b *testing.B) {
@@ -239,7 +261,7 @@ func BenchmarkSetUserUUID(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i <= b.N; i++ {
-		ctx = setUserUUID(ctx, &userUUID)
+		ctx = SetUserUUID(ctx, &userUUID)
 	}
 }
 
@@ -251,6 +273,6 @@ func BenchmarkGetUserUUID(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i <= b.N; i++ {
-		getUserUUID(ctx)
+		GetUserUUID(ctx)
 	}
 }

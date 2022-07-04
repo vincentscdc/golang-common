@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/monacohq/golang-common/transport/http/middleware/cryptouseruuid"
 	"github.com/rs/zerolog"
 )
 
@@ -97,4 +98,19 @@ func (e NotFoundError) Error() string {
 
 func (e NotFoundError) ToErrorResponse() *ErrorResponse {
 	return NewErrorResponse(e, make(map[string]string), http.StatusNotFound, "not_found", e.Error())
+}
+
+func NewErrorResponseFromCryptoUserUUIDError(err error) *ErrorResponse {
+	switch {
+	case errors.As(err, &cryptouseruuid.UserIDNotFoundError{}):
+		return NewErrorResponse(
+			err,
+			make(map[string]string),
+			http.StatusInternalServerError,
+			"user_id_not_found",
+			"user id not found",
+		)
+	default:
+		return InternalServerError{Err: err}.ToErrorResponse()
+	}
 }

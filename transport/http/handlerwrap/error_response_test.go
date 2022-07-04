@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/monacohq/golang-common/transport/http/middleware/cryptouseruuid"
 	"github.com/rs/zerolog"
 )
 
@@ -399,6 +400,41 @@ func TestErrorResponse_AddHeaders(t *testing.T) {
 				if foundV != v {
 					t.Errorf("header %s has value %s, exected %s", k, foundV, v)
 				}
+			}
+		})
+	}
+}
+
+func TestNewErrorResponseFromCryptoUserUUIDError(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		err        error
+		statusCode int
+	}{
+		{
+			name:       "user id not found",
+			err:        cryptouseruuid.UserIDNotFoundError{},
+			statusCode: http.StatusInternalServerError,
+		},
+		{
+			name:       "unknown error",
+			err:        errors.New("unknown"),
+			statusCode: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			errResp := NewErrorResponseFromCryptoUserUUIDError(tt.err)
+
+			if errResp.StatusCode != tt.statusCode {
+				t.Errorf("expected: %v, actual: %v", tt.statusCode, errResp.StatusCode)
 			}
 		})
 	}

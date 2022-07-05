@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Update deps
 - Docs, go.mod, makefile
 - Update CHANGELOG.md for transport/http/handlerwrap/v2.0.2
+- Update CHANGELOG.md for transport/http/handlerwrap/v2.0.2
 
 ### Docs
 

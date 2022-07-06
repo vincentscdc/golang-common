@@ -75,7 +75,6 @@ changelog-gen:
 		-o ./CHANGELOG.md && \
 	printf "\nchangelog generated!\n"
 
-# keep this commit unconventional so it doesnt appear in the changelog
 changelog-commit:
 	git commit -m $(MESSAGE_CHANGELOG_COMMIT) ./CHANGELOG.md
 

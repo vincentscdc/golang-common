@@ -49,7 +49,7 @@ Let's take an example of an opentelemetry module.
 
 **IMPORTANT** Note the folder and subfolders in the tag.
 
-- Make sure to add your workflows. Currently we use both [CircleCI](https://circleci.com) and Github actions to process CI. CircleCI is responsible for basic workflows such as lint, security scan, test, and coverage reporting. Github actions run benchmarks and refreshes the gh-pages automatically based on performance evaluation. Please place your workflow in `.circleci/config_package.yml` and `.github/workflows` respectively, with a name that makes sense
+- Make sure to add your workflows. Currently we use both [CircleCI](https://circleci.com) and Github actions to process CI. CircleCI is responsible for basic workflows such as lint, security scan, conventional commits check, test, and coverage reporting. Github actions run benchmarks and refreshes the gh-pages automatically based on performance evaluation. Please place your workflow in `.circleci/config_package.yml` and `.github/workflows` respectively, with a name that makes sense
   - beware of your workflow name as well as the job name
   - beware of your "on" triggers
   - beware of the necessary working_directories, related to your module

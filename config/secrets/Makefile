@@ -72,7 +72,7 @@ release-tag:
 # changelog #
 #############
 
-MESSAGE_CHANGELOG_COMMIT="docs: update CHANGELOG.md for $(MOD_VERSION)"
+MESSAGE_CHANGELOG_COMMIT="chore(changelog): update CHANGELOG.md for $(MOD_VERSION)"
 
 changelog-gen: 
 	@git cliff \
@@ -81,7 +81,6 @@ changelog-gen:
 		-o ./CHANGELOG.md && \
 	printf "\nchangelog generated!\n"
 
-# keep this commit unconventional so it doesnt appear in the changelog
 changelog-commit:
 	git commit -m $(MESSAGE_CHANGELOG_COMMIT) ./CHANGELOG.md
 

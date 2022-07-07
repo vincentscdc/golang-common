@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 - Docs, go.mod, makefile
 - Update CHANGELOG.md for transport/http/handlerwrap/v2.0.2
 - Update CHANGELOG.md for transport/http/handlerwrap/v2.0.2
+- Update CHANGELOG.md for transport/http/handlerwrap/v1.2.0
+- Move to v2
 
 ### Docs
 
@@ -24,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - Migration to CircleCI (#12)
 - Uuid middleware integration (#36)
 - Add support for middleware cryptouseruuid
+- Add conv commits check (#42)
 
 ### Fix
 

@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Update CHANGELOG.md for transport/http/handlerwrap/v2.0.2
 - Update CHANGELOG.md for transport/http/handlerwrap/v1.2.0
 - Move to v2
+- Update CHANGELOG.md for transport/http/handlerwrap/v2.0.0
 
 ### Docs
 
@@ -27,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - Uuid middleware integration (#36)
 - Add support for middleware cryptouseruuid
 - Add conv commits check (#42)
+- Add okstyle wrapper (#46)
 
 ### Fix
 

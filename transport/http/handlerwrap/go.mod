@@ -1,4 +1,4 @@
-module github.com/monacohq/golang-common/transport/http/handlerwrap
+module github.com/monacohq/golang-common/transport/http/handlerwrap/v2
 
 go 1.18
 

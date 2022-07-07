@@ -80,3 +80,22 @@ func Example_get() {
 
 	Wrapper(&logger, getHandler(getter)).ServeHTTP(nil, nil)
 }
+
+// Using the okStyle wrapper
+func Example_okStyle() {
+	zl := zerolog.New(io.Discard).With()
+
+	getter := func(r *http.Request) (*Response, *ErrorResponse) {
+		return &Response{
+			Body: map[string]any{
+				"hello": "world",
+			},
+			Headers:    make(map[string]string),
+			StatusCode: http.StatusOK,
+		}, nil
+	}
+
+	logger := zl.Logger()
+
+	Wrapper(&logger, OKStyle("data", getter))
+}

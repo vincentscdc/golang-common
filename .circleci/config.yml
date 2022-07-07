@@ -54,3 +54,5 @@ workflows:
             config/secrets/.* trigger-config-secrets true
             database/pginit/.* trigger-database-pginit true
           config-path: .circleci/config_package.yml
+          requires:
+            - conv-commits-check

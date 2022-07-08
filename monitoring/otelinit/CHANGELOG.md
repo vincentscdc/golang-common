@@ -2,27 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+### Bug Fixes
+
+- Tag_pattern and commit_parser for module vers ([#50](https://github.com/monacohq/golang-common/issues/50))
+
+### Features
+
+- Add conv commits check ([#42](https://github.com/monacohq/golang-common/issues/42))
+
 ## [monitoring/otelinit/v1.0.3] - 2022-06-22
 
-### Chore
-
-- Update deps for otelinit
-
-### Docs
+### Documentation
 
 - Changelog commit
 
-### Feat
+### Features
 
-- Migration to CircleCI (#12)
+- Migration to CircleCI ([#12](https://github.com/monacohq/golang-common/issues/12))
+
+### Miscellaneous Tasks
+
+- Update deps for otelinit
 
 ## [monitoring/otelinit/v1.0.2] - 2022-06-08
 
-### Chore
+### Miscellaneous Tasks
 
 - Update deps
 
-### Style
+### Styling
 
 - Update golangci-lint config
 - Remove unused godot linter setting
@@ -31,20 +41,20 @@ All notable changes to this project will be documented in this file.
 
 ## [monitoring/otelinit/v1.0.1] - 2022-05-11
 
-### Chore
+### Documentation
+
+- Docs gen to have something like pkg.dev in the README
+
+### Features
+
+- Add otelinit and http handlerwrap
+
+### Miscellaneous Tasks
 
 - Remove unused config in golangci
 - Updgrade deps
 
-### Docs
-
-- Docs gen to have something like pkg.dev in the README
-
-### Feat
-
-- Add otelinit and http handlerwrap
-
-### Style
+### Styling
 
 - Up version for golangci-lint to 1.46
 - Remove the fmt.print

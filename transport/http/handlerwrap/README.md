@@ -3,7 +3,7 @@
 # handlerwrap
 
 ```go
-import "github.com/monacohq/golang-common/transport/http/handlerwrap"
+import "github.com/monacohq/golang-common/transport/http/handlerwrap/v2"
 ```
 
 This package allows you to wrap your API to save you from boilerplate code
@@ -51,6 +51,34 @@ Wrapping a GET http handler\.
 	logger := zl.Logger()
 
 	Wrapper(&logger, getHandler(getter)).ServeHTTP(nil, nil)
+}
+```
+
+</p>
+</details>
+
+<details><summary>Example (Ok Style)</summary>
+<p>
+
+Using the okStyle wrapper
+
+```go
+{
+	zl := zerolog.New(io.Discard).With()
+
+	getter := func(r *http.Request) (*Response, *ErrorResponse) {
+		return &Response{
+			Body: map[string]any{
+				"hello": "world",
+			},
+			Headers:    make(map[string]string),
+			StatusCode: http.StatusOK,
+		}, nil
+	}
+
+	logger := zl.Logger()
+
+	Wrapper(&logger, OKStyle("data", getter))
 }
 ```
 
@@ -122,6 +150,7 @@ Wrapping a POST http handler\.
   - [func (e ParsingParamError) ToErrorResponse() *ErrorResponse](<#func-parsingparamerror-toerrorresponse>)
 - [type Response](<#type-response>)
 - [type TypedHandler](<#type-typedhandler>)
+  - [func OKStyle(bodyName string, handler TypedHandler) TypedHandler](<#func-okstyle>)
 
 
 ## Constants
@@ -310,6 +339,16 @@ TypedHandler is the handler that you are actually handling the response\.
 ```go
 type TypedHandler func(r *http.Request) (*Response, *ErrorResponse)
 ```
+
+### func [OKStyle](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/okstyle.go#L25>)
+
+```go
+func OKStyle(bodyName string, handler TypedHandler) TypedHandler
+```
+
+OKStyle wraps an ok styled response that uses a special boolean field \`ok\` to indicate whether the request has been successfully responded or not\. Specifically\, On success\, the response body will be transformed to \`\`\`json \{ "ok": true\, \<OTHER BODY PROPERTIES\> \} \`\`\`
+
+On failure\, the response body will be \`\`\`json \{ "ok": false\, "error\_code": \<ERROR CODE FROM APPLICATION\> "error\_message": \<ERROR MESSAGE FROM APPLICATION\> \} \`\`\`
 
 
 

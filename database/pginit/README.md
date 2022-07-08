@@ -130,7 +130,6 @@ Option configures PGInit behaviour\.
 type Option func(*PGInit)
 ```
 
-
 ### func [WithDecimalType](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L123>)
 
 ```go

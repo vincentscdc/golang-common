@@ -43,7 +43,7 @@ jobs:
 workflows:
   always-run:
     jobs:
-      # - conv-commits-check
+      - conv-commits-check
       - path-filtering/filter:
           name: check-update-files
           mapping: |
@@ -54,5 +54,5 @@ workflows:
             config/secrets/.* trigger-config-secrets true
             database/pginit/.* trigger-database-pginit true
           config-path: .circleci/config_package.yml
-          # requires:
-          #   - conv-commits-check
+          requires:
+            - conv-commits-check

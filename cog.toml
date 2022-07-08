@@ -1,8 +1,7 @@
-ignore_merge_commits = false
+ignore_merge_commits = true
 branch_whitelist = []
 pre_bump_hooks = []
 post_bump_hooks = []
-tag_prefix = "v"
 
 [commit_types]
 

@@ -26,8 +26,9 @@ type Option func(*PGInit)
 
 // PGInit provides capabilities for connect to postgres with pgx.pool.
 type PGInit struct {
-	pgxConf *pgxpool.Config
-	logLvl  pgx.LogLevel
+	pgxConf         *pgxpool.Config
+	logLvl          pgx.LogLevel
+	customDataTypes []pgtype.DataType
 }
 
 // New initializes a PGInit using the provided Config and options. If
@@ -67,6 +68,14 @@ func New(conf *Config, opts ...Option) (*PGInit, error) {
 
 	for _, opt := range opts {
 		opt(pgi)
+	}
+
+	pgi.pgxConf.AfterConnect = func(ctx context.Context, c *pgx.Conn) error {
+		for _, dataType := range pgi.customDataTypes {
+			c.ConnInfo().RegisterDataType(dataType)
+		}
+
+		return nil
 	}
 
 	return pgi, nil
@@ -122,28 +131,20 @@ func WithLogLevel(zLvl zerolog.Level) Option {
 
 func WithDecimalType() Option {
 	return func(p *PGInit) {
-		p.pgxConf.AfterConnect = func(ctx context.Context, c *pgx.Conn) error {
-			c.ConnInfo().RegisterDataType(pgtype.DataType{
-				Value: &ericlagergren.Numeric{},
-				Name:  "numeric",
-				OID:   pgtype.NumericOID,
-			})
-
-			return nil
-		}
+		p.customDataTypes = append(p.customDataTypes, pgtype.DataType{
+			Value: &ericlagergren.Numeric{},
+			Name:  "numeric",
+			OID:   pgtype.NumericOID,
+		})
 	}
 }
 
 func WithUUIDType() Option {
 	return func(p *PGInit) {
-		p.pgxConf.AfterConnect = func(ctx context.Context, c *pgx.Conn) error {
-			c.ConnInfo().RegisterDataType(pgtype.DataType{
-				Value: &gofrs.UUID{},
-				Name:  "numeric",
-				OID:   pgtype.NumericOID,
-			})
-
-			return nil
-		}
+		p.customDataTypes = append(p.customDataTypes, pgtype.DataType{
+			Value: &gofrs.UUID{},
+			Name:  "uuid",
+			OID:   pgtype.UUIDOID,
+		})
 	}
 }

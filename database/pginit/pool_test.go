@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ericlagergren/decimal"
+	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
@@ -283,6 +285,106 @@ func TestConnPoolWithLogger(t *testing.T) {
 			ctx = context.WithValue(ctx, "request-id", "12345") // nolint: revive, staticcheck, nolintlint
 			if _, err := db.Exec(ctx, "SELECT * FROM ERROR"); err == nil {
 				t.Error("expected return error")
+			}
+		})
+	}
+}
+
+func TestConnPool_WithCustomDataTypes(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name             string
+		opts             []Option
+		expectErrDecimal bool
+		expectErrUUID    bool
+	}{
+		{
+			name: "decimal + uuid",
+			opts: []Option{
+				WithLogLevel(zerolog.DebugLevel),
+				WithLogger(&zerolog.Logger{}, "request-id"),
+				WithDecimalType(),
+				WithUUIDType(),
+			},
+			expectErrDecimal: false,
+			expectErrUUID:    false,
+		},
+		{
+			name: "uuid + decimal",
+			opts: []Option{
+				WithLogLevel(zerolog.DebugLevel),
+				WithLogger(&zerolog.Logger{}, "request-id"),
+				WithUUIDType(),
+				WithDecimalType(),
+			},
+			expectErrDecimal: false,
+			expectErrUUID:    false,
+		},
+		{
+			name: "decimal",
+			opts: []Option{
+				WithLogLevel(zerolog.DebugLevel),
+				WithLogger(&zerolog.Logger{}, "request-id"),
+				WithDecimalType(),
+			},
+			expectErrDecimal: false,
+			expectErrUUID:    true,
+		},
+		{
+			name: "uuid",
+			opts: []Option{
+				WithLogLevel(zerolog.DebugLevel),
+				WithLogger(&zerolog.Logger{}, "request-id"),
+				WithUUIDType(),
+			},
+			expectErrDecimal: true,
+			expectErrUUID:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctx := context.Background()
+
+			pgi, err := New(
+				&Config{
+					Host:     testHost,
+					Port:     testPort,
+					User:     "postgres",
+					Password: "postgres",
+					Database: "datawarehouse",
+					MaxConns: 2,
+				},
+				tt.opts...,
+			)
+			if err != nil {
+				t.Error("expected no error")
+			}
+
+			db, err := pgi.ConnPool(ctx)
+			if err != nil {
+				t.Error("expected no error")
+			}
+
+			err = db.Ping(ctx)
+			if err != nil {
+				t.Error("expected no error")
+			}
+
+			d := &decimal.Big{}
+			err = db.QueryRow(context.Background(), "select 10.98").Scan(d)
+			if err != nil && !tt.expectErrDecimal {
+				t.Errorf("expected no err: %s", err)
+			}
+
+			u := &uuid.UUID{}
+			err = db.QueryRow(context.Background(), "select 'b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5'").Scan(u)
+			if err != nil && !tt.expectErrUUID {
+				t.Errorf("expected no err: %s", err)
 			}
 		})
 	}

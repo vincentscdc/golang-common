@@ -2,11 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [database/pginit/v1.3.0] - 2022-07-13
 
 ### Bug Fixes
 
 - Tag_pattern and commit_parser for module vers ([#50](https://github.com/monacohq/golang-common/issues/50))
+- Pginit options ([#58](https://github.com/monacohq/golang-common/issues/58))
 
 ### Documentation
 
@@ -16,6 +17,7 @@ All notable changes to this project will be documented in this file.
 
 - Added WithUUIDType() ([#39](https://github.com/monacohq/golang-common/issues/39))
 - Add conv commits check ([#42](https://github.com/monacohq/golang-common/issues/42))
+- New changelogs and docs up to date
 
 ## [database/pginit/v1.1.0] - 2022-07-04
 

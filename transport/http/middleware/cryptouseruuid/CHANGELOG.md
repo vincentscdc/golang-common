@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [transport/http/middleware/cryptouseruuid/v1.0.1] - 2022-07-18
 
 ### Bug Fixes
 
@@ -12,6 +12,10 @@ All notable changes to this project will be documented in this file.
 
 - Add conv commits check ([#42](https://github.com/monacohq/golang-common/issues/42))
 - New changelogs and docs up to date
+
+### Miscellaneous Tasks
+
+- Update deps cryptouuid middleware
 
 ## [transport/http/middleware/cryptouseruuid/v1.0.0] - 2022-07-04
 

@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Features
 
 - Add conv commits check ([#42](https://github.com/monacohq/golang-common/issues/42))
+- New changelogs and docs up to date
 
 ## [monitoring/otelinit/v1.0.3] - 2022-06-22
 

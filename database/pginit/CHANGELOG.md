@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [database/pginit/v1.3.1] - 2022-07-18
+## [unreleased]
 
 ### Documentation
 

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [database/pginit/v1.3.1] - 2022-07-18
+
+### Documentation
+
+- Update readme
+
+### Miscellaneous Tasks
+
+- Update deps pginit
+
 ## [database/pginit/v1.3.0] - 2022-07-13
 
 ### Bug Fixes

@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 - Tag_pattern and commit_parser for module vers ([#50](https://github.com/monacohq/golang-common/issues/50))
 
+### Features
+
+- New changelogs and docs up to date
+
 ## [transport/http/handlerwrap/v2.0.1] - 2022-07-07
 
 ### Features

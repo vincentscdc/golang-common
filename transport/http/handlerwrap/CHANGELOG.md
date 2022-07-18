@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [transport/http/handlerwrap/v2.0.2] - 2022-07-18
+## [transport/http/handlerwrap/v3.0.0] - 2022-07-18
 
 ### Bug Fixes
 
@@ -11,10 +11,12 @@ All notable changes to this project will be documented in this file.
 ### Features
 
 - New changelogs and docs up to date
+- Add user error response from new API standards ([#63](https://github.com/monacohq/golang-common/issues/63))
 
 ### Miscellaneous Tasks
 
 - Update deps handlerwrap
+- Release according to the new api standards
 
 ## [transport/http/handlerwrap/v2.0.1] - 2022-07-07
 

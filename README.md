@@ -26,7 +26,16 @@ Allow internal repositories under monacohq, simply add this line to your .zshrc 
 export GOPRIVATE="github.com/monacohq/*"
 ```
 
-## How to add a new module?
+## How to check out any of these private modules from the CircleCI in your project
+
+- Prepare a (machine) user account to have access permission both to your project and this repository.
+- Go to the `Project Settings` in CircleCI and select the `SSH Keys` menu
+- Under the `Checkout SSH Keys` section, click on `Add User Key` to add the (machine) user key
+- Proceed with authorization
+
+More details can be found in [CircleCI docs](https://circleci.com/docs/github-integration#controlling-access-via-a-machine-user).
+
+## How to add a new module
 
 Let's take an example of an opentelemetry module.
 

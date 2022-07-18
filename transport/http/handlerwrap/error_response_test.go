@@ -32,7 +32,7 @@ func TestErrorResponse_render(t *testing.T) {
 			name:            "happy path",
 			accept:          "application/json",
 			expectedStatus:  http.StatusBadRequest,
-			expectedBody:    `{"error_code":"test_render","error_msg":"test error user"}`,
+			expectedBody:    `{"error":"test_render","error_message":"test error user"}`,
 			expectedHeaders: responseHeaders,
 		},
 	}
@@ -48,11 +48,11 @@ func TestErrorResponse_render(t *testing.T) {
 			nr := httptest.NewRecorder()
 
 			her := &ErrorResponse{
-				Error:      fmt.Errorf("test render"),
-				Headers:    responseHeaders,
-				StatusCode: http.StatusBadRequest,
-				ErrorCode:  "test_render",
-				ErrorMsg:   "test error user",
+				Err:          fmt.Errorf("test render"),
+				Headers:      responseHeaders,
+				StatusCode:   http.StatusBadRequest,
+				Error:        "test_render",
+				ErrorMessage: "test error user",
 			}
 
 			logger := zl.Logger()
@@ -97,19 +97,19 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 	t.Parallel()
 
 	type fields struct {
-		Error          error
+		Err            error
 		HTTPStatusCode int
-		ErrorCode      string
-		ErrorMsg       string
+		Error          string
+		ErrorMessage   string
 	}
 
 	testErr := errors.New("test render")
 
 	refE := &ErrorResponse{
-		Error:      testErr,
-		StatusCode: http.StatusBadRequest,
-		ErrorCode:  "test_render",
-		ErrorMsg:   "test error user",
+		Err:          testErr,
+		StatusCode:   http.StatusBadRequest,
+		Error:        "test_render",
+		ErrorMessage: "test error user",
 	}
 
 	type args struct {
@@ -126,10 +126,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "equal",
 			args: args{
 				e1: &ErrorResponse{
-					Error:      testErr,
-					StatusCode: http.StatusBadRequest,
-					ErrorCode:  "test_render",
-					ErrorMsg:   "test error user",
+					Err:          testErr,
+					StatusCode:   http.StatusBadRequest,
+					Error:        "test_render",
+					ErrorMessage: "test error user",
 				},
 			},
 			want: true,
@@ -138,10 +138,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "diff error",
 			args: args{
 				e1: &ErrorResponse{
-					Error:      fmt.Errorf("diff"),
-					StatusCode: http.StatusBadRequest,
-					ErrorCode:  "test_render",
-					ErrorMsg:   "test error user",
+					Err:          fmt.Errorf("diff"),
+					StatusCode:   http.StatusBadRequest,
+					Error:        "test_render",
+					ErrorMessage: "test error user",
 				},
 			},
 			want: false,
@@ -150,10 +150,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "diff http status code",
 			args: args{
 				e1: &ErrorResponse{
-					Error:      testErr,
-					StatusCode: http.StatusInternalServerError,
-					ErrorCode:  "test_render",
-					ErrorMsg:   "test error user",
+					Err:          testErr,
+					StatusCode:   http.StatusInternalServerError,
+					Error:        "test_render",
+					ErrorMessage: "test error user",
 				},
 			},
 			want: false,
@@ -162,10 +162,10 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "diff error code",
 			args: args{
 				e1: &ErrorResponse{
-					Error:      testErr,
-					StatusCode: http.StatusBadRequest,
-					ErrorCode:  "diff",
-					ErrorMsg:   "test error user",
+					Err:          testErr,
+					StatusCode:   http.StatusBadRequest,
+					Error:        "diff",
+					ErrorMessage: "test error user",
 				},
 			},
 			want: false,
@@ -174,10 +174,26 @@ func TestErrorResponse_IsEqual(t *testing.T) {
 			name: "diff error msg",
 			args: args{
 				e1: &ErrorResponse{
-					Error:      testErr,
-					StatusCode: http.StatusBadRequest,
-					ErrorCode:  "test_render",
-					ErrorMsg:   "diff",
+					Err:          testErr,
+					StatusCode:   http.StatusBadRequest,
+					Error:        "test_render",
+					ErrorMessage: "diff",
+				},
+			},
+			want: false,
+		},
+		{
+			name: "diff L10NError",
+			args: args{
+				e1: &ErrorResponse{
+					Err:          testErr,
+					StatusCode:   http.StatusBadRequest,
+					Error:        "test_render",
+					ErrorMessage: "test error user",
+					L10NError: &L10NError{
+						TitleKey:   "title",
+						MessageKey: "messge",
+					},
 				},
 			},
 			want: false,
@@ -251,10 +267,10 @@ func TestInternalServerError_ToErrorResponse(t *testing.T) {
 			name:   "happy path",
 			fields: fields{Err: testErr},
 			want: &ErrorResponse{
-				Error:      InternalServerError{Err: testErr},
-				StatusCode: http.StatusInternalServerError,
-				ErrorCode:  "internal_error",
-				ErrorMsg:   "internal error",
+				Err:          InternalServerError{Err: testErr},
+				StatusCode:   http.StatusInternalServerError,
+				Error:        "internal_error",
+				ErrorMessage: "internal error",
 			},
 		},
 	}
@@ -326,10 +342,10 @@ func TestNotFoundError_ToErrorResponse(t *testing.T) {
 			name:   "happy path",
 			fields: fields{Designation: "v"},
 			want: &ErrorResponse{
-				Error:      NotFoundError{Designation: "v"},
-				StatusCode: http.StatusNotFound,
-				ErrorCode:  "not_found",
-				ErrorMsg:   "no corresponding `v` has been found",
+				Err:          NotFoundError{Designation: "v"},
+				StatusCode:   http.StatusNotFound,
+				Error:        "not_found",
+				ErrorMessage: "no corresponding `v` has been found",
 			},
 		},
 	}

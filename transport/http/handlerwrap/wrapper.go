@@ -21,10 +21,10 @@ func Wrapper(
 			res, err := f(req)
 			if err != nil {
 				log.Error().
-					Err(err.Error).
-					Str("ErrorCode", err.ErrorCode).
+					Err(err.Err).
+					Str("ErrorCode", err.Error).
 					Int("HTTPStatusCode", err.StatusCode).
-					Msg(err.ErrorMsg)
+					Msg(err.ErrorMessage)
 
 				err.render(log, respW, req)
 

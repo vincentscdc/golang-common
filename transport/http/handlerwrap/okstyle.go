@@ -29,8 +29,8 @@ func OKStyle(bodyName string, handler TypedHandler) TypedHandler {
 			return &Response{
 				Body: map[string]any{
 					"ok":            false,
-					"error":         err.ErrorCode,
-					"error_message": err.ErrorMsg,
+					"error":         err.Error,
+					"error_message": err.ErrorMessage,
 				},
 				StatusCode: http.StatusOK,
 				Headers:    resp.Headers,

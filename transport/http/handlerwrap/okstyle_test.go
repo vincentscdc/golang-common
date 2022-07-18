@@ -58,10 +58,10 @@ func TestOKStyle(t *testing.T) {
 						Headers:    map[string]string{},
 						StatusCode: http.StatusNotFound,
 					}, &ErrorResponse{
-						Error:      NotFoundError{Designation: "v"},
-						StatusCode: http.StatusNotFound,
-						ErrorCode:  "10000",
-						ErrorMsg:   "not found",
+						Err:          NotFoundError{Designation: "v"},
+						StatusCode:   http.StatusNotFound,
+						Error:        "10000",
+						ErrorMessage: "not found",
 					}
 			},
 			expectedResponse: &Response{

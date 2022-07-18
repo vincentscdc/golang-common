@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"reflect"
 
 	"github.com/monacohq/golang-common/transport/http/middleware/cryptouseruuid"
 	"github.com/rs/zerolog"
@@ -11,11 +12,18 @@ import (
 
 // ErrorResponse is a wrapper for the error response body to have a clean way of displaying errors.
 type ErrorResponse struct {
-	Error      error             `json:"-"`
-	Headers    map[string]string `json:"-"`
-	StatusCode int               `json:"-"`
-	ErrorCode  string            `json:"error_code"`
-	ErrorMsg   string            `json:"error_msg"`
+	Err          error             `json:"-"`
+	Headers      map[string]string `json:"-"`
+	StatusCode   int               `json:"-"`
+	Error        string            `json:"error"`
+	ErrorMessage string            `json:"error_message"`
+	L10NError    *L10NError        `json:"l10n_error,omitempty"`
+}
+
+// L10NError is an error for localization
+type L10NError struct {
+	TitleKey   string `json:"title_key"`
+	MessageKey string `json:"message_key"`
 }
 
 // NewErrorResponse creates a new ErrorResponse.
@@ -27,11 +35,34 @@ func NewErrorResponse(
 	msg string,
 ) *ErrorResponse {
 	return &ErrorResponse{
-		Error:      err,
-		Headers:    headers,
-		StatusCode: statusCode,
-		ErrorCode:  errCode,
-		ErrorMsg:   msg,
+		Err:          err,
+		Headers:      headers,
+		StatusCode:   statusCode,
+		Error:        errCode,
+		ErrorMessage: msg,
+	}
+}
+
+// NewUserErrorResponse create a new ErrorResponse with L10NError
+func NewUserErrorResponse(
+	err error,
+	headers map[string]string,
+	statusCode int,
+	errCode string,
+	msg string,
+	titleKey string,
+	msgKey string,
+) *ErrorResponse {
+	return &ErrorResponse{
+		Err:          err,
+		Headers:      headers,
+		StatusCode:   statusCode,
+		Error:        errCode,
+		ErrorMessage: msg,
+		L10NError: &L10NError{
+			TitleKey:   titleKey,
+			MessageKey: msgKey,
+		},
 	}
 }
 
@@ -55,7 +86,7 @@ func (her *ErrorResponse) render(log *zerolog.Logger, respW http.ResponseWriter,
 
 // IsEqual checks if an error response is equal to another.
 func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool {
-	if !errors.Is(errR1.Error, her.Error) {
+	if !errors.Is(errR1.Err, her.Err) {
 		return false
 	}
 
@@ -63,11 +94,15 @@ func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool {
 		return false
 	}
 
-	if errR1.ErrorCode != her.ErrorCode {
+	if errR1.Error != her.Error {
 		return false
 	}
 
-	if errR1.ErrorMsg != her.ErrorMsg {
+	if errR1.ErrorMessage != her.ErrorMessage {
+		return false
+	}
+
+	if !reflect.DeepEqual(errR1.L10NError, her.L10NError) {
 		return false
 	}
 

@@ -91,7 +91,7 @@ jobs:
     executor: go-executor
     steps:
       - checkout
-      - run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $(go env GOPATH)/bin v0.29.1
+      - run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $(go env GOPATH)/bin v0.30.0
       - run:
           name: Trivy sec scan
           working_directory: << parameters.working_directory >>
@@ -111,8 +111,7 @@ jobs:
       - run:
           name: go test
           working_directory: << parameters.working_directory >>
-          command:
-            make test
+          command: make test
 
   coverage:
     parameters:
@@ -147,7 +146,11 @@ jobs:
 workflows:
   audit-transport-http-handlerwrap:
     when:
-      or: [<<pipeline.parameters.trigger-transport-http-handlerwrap>>, <<pipeline.parameters.trigger-all>>]
+      or:
+        [
+          <<pipeline.parameters.trigger-transport-http-handlerwrap>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
     jobs:
       - linter:
           name: linter-transport-http-handlerwrap
@@ -163,7 +166,11 @@ workflows:
 
   audit-transport-http-middleware-cryptouseruuid:
     when:
-      or: [<<pipeline.parameters.trigger-transport-http-middleware-cryptouseruuid>>, <<pipeline.parameters.trigger-all>>]
+      or:
+        [
+          <<pipeline.parameters.trigger-transport-http-middleware-cryptouseruuid>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
     jobs:
       - linter:
           name: linter-transport-http-middleware-cryptouseruuid
@@ -179,7 +186,11 @@ workflows:
 
   audit-monitoring-otelinit:
     when:
-      or: [<<pipeline.parameters.trigger-monitoring-otelinit>>, <<pipeline.parameters.trigger-all>>]
+      or:
+        [
+          <<pipeline.parameters.trigger-monitoring-otelinit>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
     jobs:
       - linter:
           name: linter-monitoring-otelinit
@@ -195,7 +206,11 @@ workflows:
 
   audit-config-secrets:
     when:
-      or: [<<pipeline.parameters.trigger-config-secrets>>, <<pipeline.parameters.trigger-all>>]
+      or:
+        [
+          <<pipeline.parameters.trigger-config-secrets>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
     jobs:
       - linter:
           name: linter-config-secrets
@@ -211,7 +226,11 @@ workflows:
 
   audit-database-pginit:
     when:
-      or: [<<pipeline.parameters.trigger-database-pginit>>, <<pipeline.parameters.trigger-all>>]
+      or:
+        [
+          <<pipeline.parameters.trigger-database-pginit>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
     jobs:
       - linter:
           name: linter-database-pginit

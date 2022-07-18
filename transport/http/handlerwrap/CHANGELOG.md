@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [transport/http/handlerwrap/v2.0.2] - 2022-07-18
 
 ### Bug Fixes
 
@@ -11,6 +11,10 @@ All notable changes to this project will be documented in this file.
 ### Features
 
 - New changelogs and docs up to date
+
+### Miscellaneous Tasks
+
+- Update deps handlerwrap
 
 ## [transport/http/handlerwrap/v2.0.1] - 2022-07-07
 

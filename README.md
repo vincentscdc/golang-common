@@ -6,11 +6,11 @@ common golang packages used at crypto.com
 
 | module                      | benchmarks | latest version |
 |---|---|---|
-| [transport/http/handlerwrap](transport/http/handlerwrap) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |2.0.1|
-| [transport/http/middleware/cryptouseruuid](transport/http/middleware/cryptouseruuid) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/middleware/cryptouseruuid) |1.0.0|
-| [monitoring/otelinit](monitoring/otelinit) | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |1.0.3|
+| [transport/http/handlerwrap](transport/http/handlerwrap) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/handlerwrap/) |3.0.0|
+| [transport/http/middleware/cryptouseruuid](transport/http/middleware/cryptouseruuid) | [benches](https://turbo-winner-7f9425af.pages.github.io/transport/http/middleware/cryptouseruuid) |1.0.1|
+| [monitoring/otelinit](monitoring/otelinit) | [benches](https://turbo-winner-7f9425af.pages.github.io/monitoring/otelinit) |1.0.5|
 | [config/secrets](config/secrets) | [benches](https://turbo-winner-7f9425af.pages.github.io/config/secrets) |1.0.4|
-| [database/pginit](database/pginit) | [benches](https://turbo-winner-7f9425af.pages.github.io/database/pginit) |1.2.0|
+| [database/pginit](database/pginit) | [benches](https://turbo-winner-7f9425af.pages.github.io/database/pginit) |1.3.1|
 
 ## How to use any of these private modules
 

@@ -3,7 +3,7 @@
 # handlerwrap
 
 ```go
-import "github.com/monacohq/golang-common/transport/http/handlerwrap/v2"
+import "github.com/monacohq/golang-common/transport/http/handlerwrap/v3"
 ```
 
 This package allows you to wrap your API to save you from boilerplate code
@@ -133,11 +133,13 @@ Wrapping a POST http handler\.
   - [func BindBody(r *http.Request, target interface{}) *ErrorResponse](<#func-bindbody>)
   - [func NewErrorResponse(err error, headers map[string]string, statusCode int, errCode string, msg string) *ErrorResponse](<#func-newerrorresponse>)
   - [func NewErrorResponseFromCryptoUserUUIDError(err error) *ErrorResponse](<#func-newerrorresponsefromcryptouseruuiderror>)
+  - [func NewUserErrorResponse(err error, headers map[string]string, statusCode int, errCode string, msg string, titleKey string, msgKey string) *ErrorResponse](<#func-newusererrorresponse>)
   - [func (her *ErrorResponse) AddHeaders(headers map[string]string)](<#func-errorresponse-addheaders>)
   - [func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool](<#func-errorresponse-isequal>)
 - [type InternalServerError](<#type-internalservererror>)
   - [func (e InternalServerError) Error() string](<#func-internalservererror-error>)
   - [func (e InternalServerError) ToErrorResponse() *ErrorResponse](<#func-internalservererror-toerrorresponse>)
+- [type L10NError](<#type-l10nerror>)
 - [type MissingParamError](<#type-missingparamerror>)
   - [func (e MissingParamError) Error() string](<#func-missingparamerror-error>)
   - [func (e MissingParamError) ToErrorResponse() *ErrorResponse](<#func-missingparamerror-toerrorresponse>)
@@ -171,17 +173,18 @@ func Wrapper(log *zerolog.Logger, f TypedHandler) http.HandlerFunc
 
 Wrapper will actually do the boring work of logging an error and render the response\.
 
-## type [ErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L13-L19>)
+## type [ErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L14-L21>)
 
 ErrorResponse is a wrapper for the error response body to have a clean way of displaying errors\.
 
 ```go
 type ErrorResponse struct {
-    Error      error             `json:"-"`
-    Headers    map[string]string `json:"-"`
-    StatusCode int               `json:"-"`
-    ErrorCode  string            `json:"error_code"`
-    ErrorMsg   string            `json:"error_msg"`
+    Err          error             `json:"-"`
+    Headers      map[string]string `json:"-"`
+    StatusCode   int               `json:"-"`
+    Error        string            `json:"error"`
+    ErrorMessage string            `json:"error_message"`
+    L10NError    *L10NError        `json:"l10n_error,omitempty"`
 }
 ```
 
@@ -193,7 +196,7 @@ func BindBody(r *http.Request, target interface{}) *ErrorResponse
 
 BindBody will bind the body of the request to the given interface\.
 
-### func [NewErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L22-L28>)
+### func [NewErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L30-L36>)
 
 ```go
 func NewErrorResponse(err error, headers map[string]string, statusCode int, errCode string, msg string) *ErrorResponse
@@ -201,13 +204,21 @@ func NewErrorResponse(err error, headers map[string]string, statusCode int, errC
 
 NewErrorResponse creates a new ErrorResponse\.
 
-### func [NewErrorResponseFromCryptoUserUUIDError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L103>)
+### func [NewErrorResponseFromCryptoUserUUIDError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L138>)
 
 ```go
 func NewErrorResponseFromCryptoUserUUIDError(err error) *ErrorResponse
 ```
 
-### func \(\*ErrorResponse\) [AddHeaders](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L40>)
+### func [NewUserErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L47-L55>)
+
+```go
+func NewUserErrorResponse(err error, headers map[string]string, statusCode int, errCode string, msg string, titleKey string, msgKey string) *ErrorResponse
+```
+
+NewUserErrorResponse create a new ErrorResponse with L10NError
+
+### func \(\*ErrorResponse\) [AddHeaders](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L71>)
 
 ```go
 func (her *ErrorResponse) AddHeaders(headers map[string]string)
@@ -215,7 +226,7 @@ func (her *ErrorResponse) AddHeaders(headers map[string]string)
 
 AddHeaders add the headers to the error response it will overwrite a header if it already present\, but will leave others in place
 
-### func \(\*ErrorResponse\) [IsEqual](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L57>)
+### func \(\*ErrorResponse\) [IsEqual](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L88>)
 
 ```go
 func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool
@@ -223,7 +234,7 @@ func (her *ErrorResponse) IsEqual(errR1 *ErrorResponse) bool
 
 IsEqual checks if an error response is equal to another\.
 
-## type [InternalServerError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L78-L80>)
+## type [InternalServerError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L113-L115>)
 
 InternalServerError is an error that is returned when an internal server error occurs\.
 
@@ -233,16 +244,27 @@ type InternalServerError struct {
 }
 ```
 
-### func \(InternalServerError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L82>)
+### func \(InternalServerError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L117>)
 
 ```go
 func (e InternalServerError) Error() string
 ```
 
-### func \(InternalServerError\) [ToErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L86>)
+### func \(InternalServerError\) [ToErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L121>)
 
 ```go
 func (e InternalServerError) ToErrorResponse() *ErrorResponse
+```
+
+## type [L10NError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L24-L27>)
+
+L10NError is an error for localization
+
+```go
+type L10NError struct {
+    TitleKey   string `json:"title_key"`
+    MessageKey string `json:"message_key"`
+}
 ```
 
 ## type [MissingParamError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/url_params.go#L13-L15>)
@@ -275,7 +297,7 @@ NamedURLParamsGetter is the interface that is used to parse the URL parameters\.
 type NamedURLParamsGetter func(ctx context.Context, key string) (string, *ErrorResponse)
 ```
 
-## type [NotFoundError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L91-L93>)
+## type [NotFoundError](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L126-L128>)
 
 NotFoundError is an error that is returned when a resource is not found\.
 
@@ -285,13 +307,13 @@ type NotFoundError struct {
 }
 ```
 
-### func \(NotFoundError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L95>)
+### func \(NotFoundError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L130>)
 
 ```go
 func (e NotFoundError) Error() string
 ```
 
-### func \(NotFoundError\) [ToErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L99>)
+### func \(NotFoundError\) [ToErrorResponse](<https://github.com/monacohq/golang-common/blob/main/transport/http/handlerwrap/error_response.go#L134>)
 
 ```go
 func (e NotFoundError) ToErrorResponse() *ErrorResponse

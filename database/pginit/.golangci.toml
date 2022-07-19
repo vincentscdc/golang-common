@@ -1,9 +1,10 @@
 [service]
-golangci-lint-version =  "1.46"
+golangci-lint-version =  "1.47"
 
 [linters]
 disable-all = true
 enable = [
+    "asasalint",
     "deadcode",
     "errcheck",
     "gosimple",
@@ -37,7 +38,7 @@ enable = [
     "forbidigo",
     "forcetypeassert",
     # "funlen", the complexity is covering most of issues
-    # "gci", it's hard to make gofumpt play well with gci
+    # "gci", use of gofumpt instead
     "gochecknoglobals",
     "gochecknoinits",
     "gocognit",
@@ -75,6 +76,7 @@ enable = [
     "noctx",
     "nolintlint",
     "nonamedreturns",
+    # "nosnakecase", https://github.com/sivchari/nosnakecase/issues/9
     "nosprintfhostport",
     "paralleltest",
     "prealloc",
@@ -138,15 +140,8 @@ extra-rules = true
 
 [[issues.exclude-rules]]
 path = '(.+)_test\.go'
-linters = [
-    "funlen",
-    "goconst",
-    "interfacer",
-    "dupl",
-    "lll",
-    "goerr113",
-    "varnamelen",
-    "errcheck",
-    "cyclop",
-    "gocognit",
-]
+linters = ["funlen", "goconst", "interfacer", "dupl", "lll", "goerr113", "varnamelen", "errcheck", "gocritic", "cyclop", "wrapcheck", "gocognit"]
+
+[[issues.exclude-rules]]
+path = 'sqlc\.go'
+linters = ["wrapcheck"]

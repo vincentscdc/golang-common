@@ -5,7 +5,11 @@ help: ## Show this help
 
 all: docs-gen changelogs-gen version-table-update
 
-ALL_MODULES=$(shell git tag --merged main | sed -E 's:/v[0-9]+.*::' | uniq | tr '\n' ' ')
+ALL_MODULES=$(shell git tag --merged main | sed -E 's:/v[0-9]+.*::' | uniq)
+
+ALL_MODULES_SPACE_SEP=$(shell echo $(ALL_MODULES) | xargs printf "%s ")
+
+ALL_MODULES_DOTDOTDOT=$(shell echo $(ALL_MODULES) | xargs printf "./%s/... ")
 
 ########
 # docs #
@@ -13,7 +17,7 @@ ALL_MODULES=$(shell git tag --merged main | sed -E 's:/v[0-9]+.*::' | uniq | tr 
 
 docs-gen: ## generate docs for every module, as markdown thanks to https://github.com/princjef/gomarkdoc
 	@( \
-		for module in $(ALL_MODULES); do \
+		for module in $(ALL_MODULES_SPACE_SEP); do \
 			gomarkdoc --output ./$$module/README.md ./$$module/; \
 			printf "docs generated for $$module!\n"; \
 			git commit -m "docs: update docs for module $$module for tag $(shell git describe --abbrev=0 --tags --match "$$module/*")" ./$$module/README.md; \
@@ -26,7 +30,7 @@ docs-gen: ## generate docs for every module, as markdown thanks to https://githu
 
 changelogs-gen: ## Generate changelog for every module.
 	@( \
-		for module in $(ALL_MODULES); do \
+		for module in $(ALL_MODULES_SPACE_SEP); do \
 			git cliff \
 				--include-path "**/$$module/*" \
 				-c ./$$module/cliff.toml \
@@ -54,7 +58,7 @@ version-table-update: ## Update version table in README.md to latest version.
 ########
 
 lint: ## lints the entire codebase
-	@golangci-lint run $(ALL_MODULES) && \
+	@golangci-lint run $(ALL_MODULES_SPACE_SEP) && \
 	if [ $$(gofumpt -e -l ./ | wc -l) = "0" ] ; \
 		then exit 0; \
 	else \
@@ -73,8 +77,6 @@ sec-scan: ## scan for sec issues with trivy (trivy binary needed)
 #########
 # tests #
 #########
-
-ALL_MODULES_DOTDOTDOT = $(shell git tag --merged main | sed -E 's:/v[0-9]+.*::' | uniq | xargs printf "./%s/... ")
 
 test: ## launch tests for all modules
 	go test -v $(ALL_MODULES_DOTDOTDOT) 

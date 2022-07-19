@@ -55,7 +55,13 @@ version-table-update: ## Update version table in README.md to latest version.
 
 lint: ## lints the entire codebase
 	@golangci-lint run $(ALL_MODULES) && \
-	if [ $$(gofumpt -e -l ./ | wc -l) == "0" ] ; then exit 0; else exit 1; fi
+	if [ $$(gofumpt -e -l ./ | wc -l) = "0" ] ; \
+		then exit 0; \
+	else \
+		echo "these files needs to be gofumpt-ed"; \
+		gofumpt -e -l ./; \
+		exit 1; \
+	fi
 
 #######
 # sec #

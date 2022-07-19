@@ -26,6 +26,7 @@ jobs:
       - checkout
       - run:
           name: Install cog
+          shell: /bin/bash
           command: |
             mkdir -p "$HOME/.local/bin" || exit
             VERSION=5.1.0
@@ -35,6 +36,7 @@ jobs:
             tar xfz $TAR
       - run:
           name: cog check of conventional commits
+          shell: /bin/bash
           command: |
             cog check --from-latest-tag --ignore-merge-commits
 
@@ -44,14 +46,17 @@ jobs:
       - checkout
       - run:
           name: Install golangci-lint/run-lint
+          shell: /bin/bash
           command: |
             curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.47.1
       - run:
           name: Install gofumpt
+          shell: /bin/bash
           command: |
             go install mvdan.cc/gofumpt@latest
       - run:
           name: Linter check
+          shell: /bin/bash
           command: |
             make lint
 
@@ -62,6 +67,7 @@ jobs:
       - run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $(go env GOPATH)/bin v0.30.0
       - run:
           name: Trivy sec scan
+          shell: /bin/bash
           command: |
             make sec-scan
 
@@ -73,6 +79,7 @@ jobs:
       - run: go install github.com/mattn/goveralls@latest
       - run:
           name: Tests and coveralls
+          shell: /bin/bash
           command: |
             make coveralls
 

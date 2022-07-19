@@ -8,15 +8,15 @@ parameters:
     default: "/home/circleci/app"
 
 executors:
-  default-executor:
+  go-executor:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/go:1.18
     working_directory: << pipeline.parameters.workspace_directory >>
 
 jobs:
 
   conv-commits-check:
-    executor: default-executor
+    executor: go-executor
     steps:
       - checkout
       - run:
@@ -34,7 +34,7 @@ jobs:
             cog check --from-latest-tag --ignore-merge-commits
 
   linter:
-    executor: default-executor
+    executor: go-executor
     steps:
       - checkout
       - run:
@@ -51,7 +51,7 @@ jobs:
             make lint
 
   sec-scan:
-    executor: default-executor
+    executor: go-executor
     steps:
       - checkout
       - run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $(go env GOPATH)/bin v0.30.0
@@ -61,7 +61,7 @@ jobs:
             make sec-scans
 
   coveralls:
-    executor: default-executor
+    executor: go-executor
     steps:
       - checkout
       - run: go mod download

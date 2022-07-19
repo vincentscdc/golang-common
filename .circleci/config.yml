@@ -12,6 +12,11 @@ executors:
     docker:
       - image: cimg/go:1.18
     working_directory: << pipeline.parameters.workspace_directory >>
+  test-executor:
+    machine:
+      image: ubuntu-2204:2022.04.1
+      docker_layer_caching: true
+    working_directory: << pipeline.parameters.workspace_directory >>
 
 jobs:
 
@@ -61,7 +66,7 @@ jobs:
             make sec-scan
 
   coveralls:
-    executor: go-executor
+    executor: test-executor
     steps:
       - checkout
       - run: go mod download

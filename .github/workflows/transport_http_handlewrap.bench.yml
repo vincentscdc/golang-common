@@ -31,12 +31,6 @@ jobs:
         run: |
           git config --global url.https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/.insteadOf https://github.com/
           go test ./... -bench=. -benchmem | tee ./bench-continuous.txt
-      # Download previous benchmark result from cache (if exists)
-      - name: Download previous benchmark data
-        uses: actions/cache@v3
-        with:
-          path: ./cache/transport/http/handlerwrap
-          key: ${{ runner.os }}-benchmark
       # Run `github-action-benchmark` action
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1

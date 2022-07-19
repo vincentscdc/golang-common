@@ -74,7 +74,7 @@ test: ## launch tests for all modules
 	go test -v $(ALL_MODULES_DOTDOTDOT) 
 
 coveralls: ## launch tests for all modules and send them to coveralls
-	@( 
+	@( \
 		go test -v $(ALL_MODULES_DOTDOTDOT) -covermode=atomic -coverprofile=./coverage.out; \
 		goveralls -covermode=atomic -coverprofile=./coverage.out -service=circle-ci -repotoken=$(COVERALLS_TOKEN) \
 	)

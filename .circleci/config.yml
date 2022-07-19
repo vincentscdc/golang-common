@@ -58,7 +58,7 @@ jobs:
       - run:
           name: Trivy sec scan
           command: |
-            make sec-scans
+            make sec-scan
 
   coveralls:
     executor: go-executor

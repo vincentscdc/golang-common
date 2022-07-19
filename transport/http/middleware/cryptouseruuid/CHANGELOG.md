@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [transport/http/middleware/cryptouseruuid/v1.0.1] - 2022-07-18
+## [unreleased]
 
 ### Bug Fixes
 
@@ -12,10 +12,15 @@ All notable changes to this project will be documented in this file.
 
 - Add conv commits check ([#42](https://github.com/monacohq/golang-common/issues/42))
 - New changelogs and docs up to date
+- Use golangci-lint 1.47 ([#66](https://github.com/monacohq/golang-common/issues/66))
 
 ### Miscellaneous Tasks
 
 - Update deps cryptouuid middleware
+
+### Refactor
+
+- Centralize golangci config in the root folder
 
 ## [transport/http/middleware/cryptouseruuid/v1.0.0] - 2022-07-04
 

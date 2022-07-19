@@ -6,7 +6,7 @@ parameters:
   workspace_directory:
     type: string
     default: "/home/circleci/app"
-    
+
 executors:
   default-executor:
     docker:
@@ -61,7 +61,7 @@ jobs:
             make sec-scans
 
   coveralls:
-    executor: test-executor
+    executor: default-executor
     steps:
       - checkout
       - run: go mod download

@@ -13,7 +13,7 @@ type Response struct {
 	StatusCode int
 }
 
-func (hr *Response) render(log *zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
+func (hr *Response) render(log *zerolog.Logger, respW http.ResponseWriter, _ *http.Request) {
 	render(
 		log,
 		hr.Headers,

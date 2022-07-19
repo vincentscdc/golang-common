@@ -2,6 +2,11 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+parameters:
+  workspace_directory:
+    type: string
+    default: "/home/circleci/app"
+    
 executors:
   default-executor:
     docker:

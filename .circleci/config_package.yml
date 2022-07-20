@@ -1,0 +1,293 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+parameters:
+  workspace_directory:
+    type: string
+    default: "/home/circleci/app"
+  trigger-all:
+    type: boolean
+    default: false
+  trigger-transport-http-handlerwrap:
+    type: boolean
+    default: false
+  trigger-transport-http-middleware-cryptouseruuid:
+    type: boolean
+    default: false
+  trigger-transport-http-middleware-requestlogger:
+    type: boolean
+    default: false
+  trigger-monitoring-otelinit:
+    type: boolean
+    default: false
+  trigger-config-secrets:
+    type: boolean
+    default: false
+  trigger-database-pginit:
+    type: boolean
+    default: false
+
+executors:
+  default-executor:
+    docker:
+      - image: cimg/base:stable
+    working_directory: << pipeline.parameters.workspace_directory >>
+  go-executor:
+    docker:
+      - image: cimg/go:1.18
+    working_directory: << pipeline.parameters.workspace_directory >>
+  test-executor:
+    machine:
+      image: ubuntu-2204:2022.04.1
+      docker_layer_caching: true
+    working_directory: << pipeline.parameters.workspace_directory >>
+
+commands:
+  attach-app-workspace:
+    steps:
+      - attach_workspace:
+          at: << pipeline.parameters.workspace_directory >>
+  persist-app-workspace:
+    steps:
+      - persist_to_workspace:
+          root: << pipeline.parameters.workspace_directory >>
+          paths:
+            - .
+  persist-build-workspace:
+    steps:
+      - persist_to_workspace:
+          root: << pipeline.parameters.workspace_directory >>
+          paths:
+            - build
+
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+jobs:
+  linter:
+    parameters:
+      working_directory:
+        type: string
+        description: "working directory to execute lint"
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Install gofumpt
+          command: |
+            go install mvdan.cc/gofumpt@latest
+      - run:
+          name: Install golangci-lint/run-lint
+          command: |
+            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.47.0
+      - run:
+          name: Linter check
+          working_directory: << parameters.working_directory >>
+          command: |
+            make lint SHELL=/bin/bash
+
+  sec-scan:
+    parameters:
+      working_directory:
+        description: "working directory where to scan"
+        type: string
+    executor: go-executor
+    steps:
+      - checkout
+      - run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $(go env GOPATH)/bin v0.30.0
+      - run:
+          name: Trivy sec scan
+          working_directory: << parameters.working_directory >>
+          command: |
+            make sec-scan
+
+  test:
+    parameters:
+      working_directory:
+        type: string
+        description: "working directory to execute test"
+    executor: test-executor
+    steps:
+      - checkout
+      - run: go mod download
+      - run: go install github.com/mattn/goveralls@latest
+      - run:
+          name: go test
+          working_directory: << parameters.working_directory >>
+          command: make test
+
+  coverage:
+    parameters:
+      working_directory:
+        type: string
+        description: "working directory to execute coverage"
+    executor: test-executor
+    steps:
+      - checkout
+      - run: go mod download
+      - run: go install github.com/mattn/goveralls@latest
+      - run:
+          name: Send coverage
+          working_directory: << parameters.working_directory >>
+          command: |
+            go test -cover -covermode=atomic -coverprofile=./coverage.out
+            goveralls -parallel -service=circle-ci -repotoken=$COVERALLS_TOKEN -jobid=$(git rev-parse --short HEAD) -covermode=atomic -coverprofile=./coverage.out -package="<<parameters.working_directory>>" -flagname="<<parameters.working_directory>>"
+
+  coverage-finish:
+    executor: go-executor
+    steps:
+      - checkout
+      - run: go mod download
+      - run: go install github.com/mattn/goveralls@latest
+      - run:
+          name: Send coverage
+          command: |
+            curl -k https://coveralls.io/webhook -d "payload[build_num]=$(git rev-parse --short HEAD)&payload[status]=done&repo_token=$COVERALLS_TOKEN"
+
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+workflows:
+  audit-transport-http-handlerwrap:
+    when:
+      or:
+        [
+          <<pipeline.parameters.trigger-transport-http-handlerwrap>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
+    jobs:
+      - linter:
+          name: linter-transport-http-handlerwrap
+          working_directory: "transport/http/handlerwrap"
+      - sec-scan:
+          name: sec-scan-transport-http-handlerwrap
+          working_directory: "transport/http/handlerwrap"
+      - test:
+          name: test-transport-http-handlerwrap
+          working_directory: "transport/http/handlerwrap"
+          requires:
+            - linter-transport-http-handlerwrap
+
+  audit-transport-http-middleware-cryptouseruuid:
+    when:
+      or:
+        [
+          <<pipeline.parameters.trigger-transport-http-middleware-cryptouseruuid>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
+    jobs:
+      - linter:
+          name: linter-transport-http-middleware-cryptouseruuid
+          working_directory: "transport/http/middleware/cryptouseruuid"
+      - sec-scan:
+          name: sec-scan-transport-http-middleware-cryptouseruuid
+          working_directory: "transport/http/middleware/cryptouseruuid"
+      - test:
+          name: test-transport-http-middleware-cryptouseruuid
+          working_directory: "transport/http/middleware/cryptouseruuid"
+          requires:
+            - linter-transport-http-middleware-cryptouseruuid
+
+  audit-transport-http-middleware-requestlogger:
+    when:
+      or: [<<pipeline.parameters.trigger-transport-http-middleware-requestlogger>>, <<pipeline.parameters.trigger-all>>]
+    jobs:
+      - linter:
+          name: linter-transport-http-middleware-requestlogger
+          working_directory: "transport/http/middleware/requestlogger"
+      - sec-scan:
+          name: sec-scan-transport-http-middleware-requestlogger
+          working_directory: "transport/http/middleware/requestlogger"
+      - test:
+          name: test-transport-http-middleware-requestlogger
+          working_directory: "transport/http/middleware/requestlogger"
+          requires:
+            - linter-transport-http-middleware-requestlogger
+
+  audit-monitoring-otelinit:
+    when:
+      or:
+        [
+          <<pipeline.parameters.trigger-monitoring-otelinit>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
+    jobs:
+      - linter:
+          name: linter-monitoring-otelinit
+          working_directory: "monitoring/otelinit"
+      - sec-scan:
+          name: sec-scan-monitoring-otelinit
+          working_directory: "monitoring/otelinit"
+      - test:
+          name: test-monitoring-otelinit
+          working_directory: "monitoring/otelinit"
+          requires:
+            - linter-monitoring-otelinit
+
+  audit-config-secrets:
+    when:
+      or:
+        [
+          <<pipeline.parameters.trigger-config-secrets>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
+    jobs:
+      - linter:
+          name: linter-config-secrets
+          working_directory: "config/secrets"
+      - sec-scan:
+          name: sec-scan-config-secrets
+          working_directory: "config/secrets"
+      - test:
+          name: test-config-secrets
+          working_directory: "config/secrets"
+          requires:
+            - linter-config-secrets
+
+  audit-database-pginit:
+    when:
+      or:
+        [
+          <<pipeline.parameters.trigger-database-pginit>>,
+          <<pipeline.parameters.trigger-all>>,
+        ]
+    jobs:
+      - linter:
+          name: linter-database-pginit
+          working_directory: "database/pginit"
+      - sec-scan:
+          name: sec-scan-database-pginit
+          working_directory: "database/pginit"
+      - test:
+          name: test-database-pginit
+          working_directory: "database/pginit"
+          requires:
+            - linter-database-pginit
+
+  coverage-all:
+    jobs:
+      - coverage:
+          name: coverage-transport-http-handlewrap
+          working_directory: "transport/http/handlerwrap"
+      - coverage:
+          name: coverage-transport-http-middleware-cryptouseruuid
+          working_directory: "transport/http/middleware/cryptouseruuid"
+      - coverage:
+          name: coverage-transport-http-middleware-requestlogger
+          working_directory: "transport/http/middleware/requestlogger"
+      - coverage:
+          name: coverage-monitoring-otelinit
+          working_directory: "monitoring/otelinit"
+      - coverage:
+          name: coverage-config-secrets
+          working_directory: "config/secrets"
+      - coverage:
+          name: coverage-database-pginit
+          working_directory: "database/pginit"
+      - coverage-finish:
+          requires:
+            - coverage-transport-http-handlewrap
+            - coverage-transport-http-middleware-cryptouseruuid
+            - coverage-transport-http-middleware-requestlogger
+            - coverage-monitoring-otelinit
+            - coverage-config-secrets
+            - coverage-database-pginit

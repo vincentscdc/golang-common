@@ -6,4 +6,5 @@ use (
 	./monitoring/otelinit
 	./transport/http/handlerwrap
 	./transport/http/middleware/cryptouseruuid
+	./transport/http/middleware/requestlogger
 )

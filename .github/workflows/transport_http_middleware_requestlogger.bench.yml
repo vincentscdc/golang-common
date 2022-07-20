@@ -1,0 +1,50 @@
+name: "Bench transport/http/middleware/requestlogger"
+
+on:
+  push:
+    paths:
+      - "transport/http/middleware/requestlogger/**"
+      - ".github/workflows/**"
+    branches: [main]
+  pull_request:
+    paths:
+      - "transport/http/middleware/requestlogger/**"
+      - ".github/workflows/**"
+    branches: [main]
+
+jobs:
+  benchmark:
+    name: Performance regression check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # Run benchmark with `go test -bench` and stores the output to a file
+      - name: Run benchmark
+        working-directory: transport/http/middleware/requestlogger
+        env:
+          GOPRIVATE: "github.com/monacohq/*"
+        run: |
+          git config --global url.https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/.insteadOf https://github.com/
+          go test ./... -bench=. -benchmem | tee ./bench-continuous.txt
+      # Run `github-action-benchmark` action
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: "go"
+          output-file-path: ./transport/http/middleware/requestlogger/bench-continuous.txt
+          # Workflow will fail when an alert happens
+          fail-on-alert: true
+          # GitHub API token to make a commit comment
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Enable alert commit comment
+          comment-on-alert: true
+          benchmark-data-dir-path: ./transport/http/middleware/requestlogger/
+          # When cache is used
+          # external-data-json-path: ./cache/transport/http/middleware/requestlogger/benchmark-data.json
+          # Push and deploy GitHub pages branch automatically
+          auto-push: true

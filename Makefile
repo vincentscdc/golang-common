@@ -5,7 +5,7 @@ help: ## Show this help
 
 all: docs-gen changelogs-gen version-table-update
 
-ALL_MODULES=$(shell git tag --merged main | sed -E 's:/v[0-9]+.*::' | uniq)
+ALL_MODULES=$(shell go work edit -json | grep ModPath | sed -E 's:^.*golang-common/(.*)":\1:' | sed -E 's:/v[0-9]+$$::')
 
 ALL_MODULES_SPACE_SEP=$(shell echo $(ALL_MODULES) | xargs printf "%s ")
 
@@ -79,7 +79,7 @@ sec-scan: ## scan for sec issues with trivy (trivy binary needed)
 #########
 
 test: ## launch tests for all modules
-	go test -v $(ALL_MODULES_DOTDOTDOT) 
+	go test -v $(ALL_MODULES_DOTDOTDOT)
 
 coveralls: ## launch tests for all modules and send them to coveralls
 	@( \

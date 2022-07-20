@@ -7,12 +7,19 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 - Tag_pattern and commit_parser for module vers ([#50](https://github.com/monacohq/golang-common/issues/50))
+- Add GOPRIVATE and github token ([#65](https://github.com/monacohq/golang-common/issues/65))
 
 ### Features
 
 - New package "mapstruct" for secrets injection  ([#24](https://github.com/monacohq/golang-common/issues/24))
 - Add more supporting for number types ([#30](https://github.com/monacohq/golang-common/issues/30))
 - Add conv commits check ([#42](https://github.com/monacohq/golang-common/issues/42))
+- New changelogs and docs up to date
+- Use golangci-lint 1.47 ([#66](https://github.com/monacohq/golang-common/issues/66))
+
+### Refactor
+
+- Centralize golangci config in the root folder
 
 ## [config/secrets/v1.0.4] - 2022-06-22
 

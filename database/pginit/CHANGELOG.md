@@ -4,13 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### Bug Fixes
+
+- Add GOPRIVATE and github token ([#65](https://github.com/monacohq/golang-common/issues/65))
+
 ### Documentation
 
 - Update readme
 
+### Features
+
+- Use golangci-lint 1.47 ([#66](https://github.com/monacohq/golang-common/issues/66))
+
 ### Miscellaneous Tasks
 
 - Update deps pginit
+
+### Refactor
+
+- Centralize golangci config in the root folder
 
 ## [database/pginit/v1.3.0] - 2022-07-13
 

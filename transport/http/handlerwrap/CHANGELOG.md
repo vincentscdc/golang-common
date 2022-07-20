@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+### Documentation
+
+- Update README
+
+### Features
+
+- Use golangci-lint 1.47 ([#66](https://github.com/monacohq/golang-common/issues/66))
+
+### Refactor
+
+- Centralize golangci config in the root folder
+
 ## [transport/http/handlerwrap/v3.0.0] - 2022-07-18
 
 ### Bug Fixes

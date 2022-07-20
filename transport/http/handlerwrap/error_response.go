@@ -74,7 +74,7 @@ func (her *ErrorResponse) AddHeaders(headers map[string]string) {
 	}
 }
 
-func (her *ErrorResponse) render(log *zerolog.Logger, respW http.ResponseWriter, req *http.Request) {
+func (her *ErrorResponse) render(log *zerolog.Logger, respW http.ResponseWriter, _ *http.Request) {
 	render(
 		log,
 		her.Headers,

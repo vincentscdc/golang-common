@@ -22,21 +22,6 @@ bench: ## launch benchs
 bench-compare: ## compare benchs results
 	benchstat ./bench.txt
 
-########
-# lint #
-########
-
-lint: ## lints the entire codebase
-	golangci-lint run ./... --config=./.golangci.toml && \
-	if [ $$(gofumpt -e -l ./ | wc -l) == "0" ] ; then exit 0; else exit 1; fi
-
-#######
-# sec #
-#######
-
-sec-scan: ## scan for sec issues with trivy (trivy binary needed)
-	trivy fs ./
-
 ############
 # upgrades #
 ############
@@ -61,27 +46,3 @@ release-tag:
 	read -r TAG && \
 	git tag $$TAG && \
 	printf "\nrelease tagged $$TAG !\n"
-
-#############
-# changelog #
-#############
-
-MESSAGE_CHANGELOG_COMMIT="chore(changelog): update CHANGELOG.md for $(MOD_VERSION)"
-
-changelog-gen: 
-	@git cliff \
-		--include-path "**/$(MOD_NAME)/*" \
-		--repository ../../../ \
-		-o ./CHANGELOG.md && \
-	printf "\nchangelog generated!\n"
-
-changelog-commit:
-	git commit -m $(MESSAGE_CHANGELOG_COMMIT) ./CHANGELOG.md
-
-########
-# docs #
-########
-
-docs-gen: ## generate docs as markdown thanks to https://github.com/princjef/gomarkdoc
-	@gomarkdoc --output README.md . && \
-	printf "\ndocs generated!\n"

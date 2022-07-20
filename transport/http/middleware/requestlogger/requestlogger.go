@@ -74,7 +74,7 @@ func RequestLogger(log *zerolog.Logger) func(next http.Handler) http.Handler {
 					Str("proto", req.Proto).
 					Int("bytes", respWriterWrapper.BytesWritten()).
 					Int("status", respWriterWrapper.Status()).
-					Dur("duration", time.Since(start)).
+					Int64("duration_ms", time.Since(start).Milliseconds()).
 					Send()
 			}()
 

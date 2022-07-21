@@ -6,6 +6,34 @@
 import "github.com/monacohq/golang-common/transport/http/middleware/cryptouseruuid"
 ```
 
+This package allows you to get the user uuid from HTTP header and set it into the context
+
+<details><summary>Example (Usage)</summary>
+<p>
+
+Using standard net/http package
+
+```go
+{
+	zl := zerolog.New(io.Discard).With()
+	log := zl.Logger()
+
+	handler := func(w http.ResponseWriter, _ *http.Request) {
+		w.Write([]byte("ok"))
+	}
+
+	mux := http.NewServeMux()
+
+	finalHandler := http.HandlerFunc(handler)
+	uuidHandler := UserUUID(&log)
+
+	mux.Handle("/", uuidHandler(finalHandler))
+}
+```
+
+</p>
+</details>
+
 ## Index
 
 - [Constants](<#constants>)
@@ -26,39 +54,47 @@ const (
 )
 ```
 
-## func [GetUserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L74>)
+## func [GetUserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/useruuid.go#L78>)
 
 ```go
 func GetUserUUID(ctx context.Context) (*uuid.UUID, error)
 ```
 
-## func [SetUserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L70>)
+GetUserUUID returns the uuid value associated with the context for key contextValKeyUserUUID
+
+## func [SetUserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/useruuid.go#L73>)
 
 ```go
 func SetUserUUID(ctx context.Context, userUUID *uuid.UUID) context.Context
 ```
 
-## func [UserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L38>)
+SetUserUUID returns a context in which the value associated with the key contextValKeyUserUUID is the provided uuid
+
+## func [UserUUID](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/useruuid.go#L40>)
 
 ```go
 func UserUUID(log *zerolog.Logger) func(http.Handler) http.Handler
 ```
 
-UserUUID is a middleware to get the user uuid from HTTP header\. Set it into ctx otherwise abort with a 401 HTTP status code
+UserUUID is a middleware to get the user uuid from HTTP header and set into ctx\, otherwise abort with a 401 HTTP status code
 
-## type [UserIDNotFoundError](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L22>)
+## type [UserIDNotFoundError](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/useruuid.go#L23>)
+
+UserIDNotFoundError is the error that is returned when there is no user uuid found in the ctx
 
 ```go
 type UserIDNotFoundError struct{}
 ```
 
-### func \(UserIDNotFoundError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L24>)
+### func \(UserIDNotFoundError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/useruuid.go#L25>)
 
 ```go
 func (m UserIDNotFoundError) Error() string
 ```
 
-## type [UserUUIDInvalidError](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L28-L30>)
+## type [UserUUIDInvalidError](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/useruuid.go#L30-L32>)
+
+UserUUIDInvalidError is the error that is returned when the user id is not a valid uuid
 
 ```go
 type UserUUIDInvalidError struct {
@@ -66,7 +102,7 @@ type UserUUIDInvalidError struct {
 }
 ```
 
-### func \(UserUUIDInvalidError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/cryptouseruuid.go#L32>)
+### func \(UserUUIDInvalidError\) [Error](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/cryptouseruuid/useruuid.go#L34>)
 
 ```go
 func (m UserUUIDInvalidError) Error() string

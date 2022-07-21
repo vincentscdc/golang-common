@@ -6,6 +6,30 @@
 import "github.com/monacohq/golang-common/transport/http/middleware/requestlogger"
 ```
 
+<details><summary>Example (Usage)</summary>
+<p>
+
+Using standard net/http package
+
+```go
+{
+	log := zerolog.New(io.Discard)
+
+	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	mux := http.NewServeMux()
+
+	loggerHandler := RequestLogger(&log)
+
+	mux.Handle("/", loggerHandler(nextHandler))
+}
+```
+
+</p>
+</details>
+
 ## Index
 
 - [func RequestLogger(log *zerolog.Logger) func(next http.Handler) http.Handler](<#func-requestlogger>)

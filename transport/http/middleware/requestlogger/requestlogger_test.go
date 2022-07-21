@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -127,8 +128,7 @@ func BenchmarkRequestLogger(b *testing.B) {
 		w.Write(data)
 	})
 
-	var logMsg bytes.Buffer
-	log := zerolog.New(&logMsg)
+	log := zerolog.New(io.Discard)
 
 	req := httptest.NewRequest("GET", "https://example.com", nil)
 	rr := httptest.NewRecorder()

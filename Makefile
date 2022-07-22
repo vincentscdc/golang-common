@@ -103,7 +103,7 @@ upgrade: ## upgrade selection module dependencies (beware, it can break everythi
 # release #
 ###########
 
-release: ## release selection module, tag, gen-changelog, and commit
+release: ## release selection module, gen-changelog, commit and tag
 	@( \
 		select module in $(ALL_MODULES_SPACE_SEP); do \
 			if [ -z $$module ]; then \
@@ -112,16 +112,17 @@ release: ## release selection module, tag, gen-changelog, and commit
 			printf "here is the $$module latest tag present: "; \
 			git describe --abbrev=0 --tags --match "$$module/*"; \
 			printf "what tag do you want to give? (use the form $$module/vX.X.X): "; \
-			read -r TAG && \
-			git tag $$TAG && \
-			printf "\nrelease tagged $$TAG !\n"; \
+			read -r TAG; \
 			sed -i '' -E "s:TAG_MODULE:$$module:g" ./cliff.toml && \
 			git cliff \
+				--tag $$TAG \
 				--include-path "**/$$module/*" \
 				-o ./$$module/CHANGELOG.md && \
 			sed -i '' -E "s:$$module:TAG_MODULE:g" ./cliff.toml && \
 			printf "\nchangelog generated for $$module!\n"; \
-			git commit -m "docs(changelog): update CHANGELOG.md for $$(git describe --abbrev=0 --tags --match "$$module/*")" ./$$module/CHANGELOG.md && \
+			git commit -m "docs(changelog): update CHANGELOG.md for $$TAG" ./$$module/CHANGELOG.md && \
+			git tag $$TAG && \
+			printf "\nrelease tagged $$TAG !\n"; \
 			printf "\nrelease and tagging has been done, if you are OK with everything, just git push origin $$(git describe --abbrev=0 --tags --match "$$module/*")\n"; \
 			break; \
 		done \

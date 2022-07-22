@@ -1,4 +1,4 @@
-.PHONY: docs-gen changelog-gen version-table-update
+.PHONY: docs-gen changelogs-gen version-table-update lint sec-scan upgrade release test coveralls
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -18,11 +18,12 @@ ALL_MODULES_DOTDOTDOT=$(shell echo $(ALL_MODULES) | xargs printf "./%s/... ")
 docs-gen: ## generate docs for every module, as markdown thanks to https://github.com/princjef/gomarkdoc
 	@( \
 		for module in $(ALL_MODULES_SPACE_SEP); do \
-			gomarkdoc --output ./$$module/README.md ./$$module/; \
+			gomarkdoc --output ./$$module/README.md ./$$module/ && \
 			printf "docs generated for $$module!\n"; \
-			git commit -m "docs: update docs for module $$module for tag $(shell git describe --abbrev=0 --tags --match "$$module/*")" ./$$module/README.md; \
+			git commit -m "docs: update docs for module $$module" ./$$module/README.md; \
 		done \
 	)
+
 
 ##############
 # changelogs #
@@ -31,12 +32,13 @@ docs-gen: ## generate docs for every module, as markdown thanks to https://githu
 changelogs-gen: ## Generate changelog for every module.
 	@( \
 		for module in $(ALL_MODULES_SPACE_SEP); do \
+			sed -i '' -E "s:TAG_MODULE:$$module:g" ./cliff.toml && \
 			git cliff \
 				--include-path "**/$$module/*" \
-				-c ./$$module/cliff.toml \
-				-o ./$$module/CHANGELOG.md; \
+				-o ./$$module/CHANGELOG.md && \
+			sed -i '' -E "s:$$module:TAG_MODULE:g" ./cliff.toml && \
 			printf "\nchangelog generated for $$module!\n"; \
-			git commit -m "docs(changelog): update CHANGELOG.md for $(shell git describe --abbrev=0 --tags --match "$$module/*")" ./$$module/CHANGELOG.md; \
+			git commit -m "docs(changelog): update CHANGELOG.md for $$(git describe --abbrev=0 --tags --match "$$module/*")" ./$$module/CHANGELOG.md; \
 		done \
 	)
 
@@ -53,6 +55,7 @@ version-table-update: ## Update version table in README.md to latest version.
 		git commit -m "docs(readme): update latest versions" ./README.md; \
 	)
 
+
 ########
 # lint #
 ########
@@ -67,12 +70,63 @@ lint: ## lints the entire codebase
 		exit 1; \
 	fi
 
+
 #######
 # sec #
 #######
 
 sec-scan: ## scan for sec issues with trivy (trivy binary needed)
 	trivy fs ./
+
+
+###########
+# upgrade #
+###########
+
+upgrade: ## upgrade selection module dependencies (beware, it can break everything)
+	@( \
+		select module in $(ALL_MODULES_SPACE_SEP); do \
+			if [ -z $$module ]; then \
+				break; \
+			fi; \
+			pushd $$module > /dev/null && \
+			go mod tidy && \
+			go get -t -u ./... && \
+			go mod tidy && \
+			popd > /dev/null; \
+			break; \
+		done \
+	)
+
+
+###########
+# release #
+###########
+
+release: ## release selection module, tag, gen-changelog, and commit
+	@( \
+		select module in $(ALL_MODULES_SPACE_SEP); do \
+			if [ -z $$module ]; then \
+				break; \
+			fi; \
+			printf "here is the $$module latest tag present: "; \
+			git describe --abbrev=0 --tags --match "$$module/*"; \
+			printf "what tag do you want to give? (use the form $$module/vX.X.X): "; \
+			read -r TAG && \
+			git tag $$TAG && \
+			printf "\nrelease tagged $$TAG !\n"; \
+			sed -i '' -E "s:TAG_MODULE:$$module:g" ./cliff.toml && \
+			git cliff \
+				--include-path "**/$$module/*" \
+				-o ./$$module/CHANGELOG.md && \
+			sed -i '' -E "s:$$module:TAG_MODULE:g" ./cliff.toml && \
+			printf "\nchangelog generated for $$module!\n"; \
+			git commit -m "docs(changelog): update CHANGELOG.md for $$(git describe --abbrev=0 --tags --match "$$module/*")" ./$$module/CHANGELOG.md && \
+			printf "\nrelease and tagging has been done, if you are OK with everything, just git push origin $$(git describe --abbrev=0 --tags --match "$$module/*")\n"; \
+			break; \
+		done \
+	)
+
 
 #########
 # tests #

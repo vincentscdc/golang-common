@@ -54,9 +54,9 @@ commit_parsers = [
 # filter out the commits that are not matched by commit parsers
 filter_commits = false
 # glob pattern for matching git tags
-tag_pattern = "transport/http/handlerwrap/v[0-9]*"
+tag_pattern = "TAG_MODULE/v[0-9]*"
 # regex for skipping tags
-skip_tags = "transport/http/handlerwrap/v0.1.0-beta.1"
+skip_tags = "TAG_MODULE/v0.1.0-beta.1"
 # regex for ignoring tags
 ignore_tags = ""
 # sort the tags chronologically

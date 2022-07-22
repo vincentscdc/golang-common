@@ -48,7 +48,7 @@ jobs:
           name: Install golangci-lint/run-lint
           shell: /bin/bash
           command: |
-            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.47.1
+            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.47.2
       - run:
           name: Install gofumpt
           shell: /bin/bash
@@ -64,7 +64,7 @@ jobs:
     executor: go-executor
     steps:
       - checkout
-      - run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $(go env GOPATH)/bin v0.30.0
+      - run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $(go env GOPATH)/bin v0.30.2
       - run:
           name: Trivy sec scan
           shell: /bin/bash

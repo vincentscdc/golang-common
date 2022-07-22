@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [config/secrets/v1.0.5] - 2022-07-20
 
 ### Bug Fixes
 
@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
 
 ### Refactor
 
-- Centralize golangci config in the root folder
+- Centralize golangci config in the root folder ([#69](https://github.com/monacohq/golang-common/issues/69))
 
 ## [config/secrets/v1.0.4] - 2022-06-22
 

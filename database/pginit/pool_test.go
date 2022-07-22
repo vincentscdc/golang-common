@@ -1,4 +1,4 @@
-package pginit
+package pginit_test
 
 import (
 	"context"
@@ -15,6 +15,7 @@ import (
 	"github.com/ericlagergren/decimal"
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v4"
+	"github.com/monacohq/golang-common/database/pginit"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/rs/zerolog"
@@ -114,11 +115,11 @@ func TestConnPool(t *testing.T) {
 
 	type want struct {
 		Err    error
-		Config Config
+		Config pginit.Config
 	}
 
 	type args struct {
-		Config Config
+		Config pginit.Config
 	}
 
 	tests := []struct {
@@ -130,7 +131,7 @@ func TestConnPool(t *testing.T) {
 		{
 			name: "expecting no error with default connection setting",
 			args: args{
-				Config{
+				pginit.Config{
 					Host:     testHost,
 					Port:     testPort,
 					User:     "postgres",
@@ -140,7 +141,7 @@ func TestConnPool(t *testing.T) {
 			},
 			want: want{
 				Err: nil,
-				Config: Config{
+				Config: pginit.Config{
 					MaxConns:     25,
 					MaxIdleConns: 25,
 					MaxLifeTime:  5 * time.Minute,
@@ -150,7 +151,7 @@ func TestConnPool(t *testing.T) {
 		{
 			name: "expecting no error with custom connection setting",
 			args: args{
-				Config{
+				pginit.Config{
 					Host:         testHost,
 					Port:         testPort,
 					User:         "postgres",
@@ -163,7 +164,7 @@ func TestConnPool(t *testing.T) {
 			},
 			want: want{
 				Err: nil,
-				Config: Config{
+				Config: pginit.Config{
 					MaxConns:     15,
 					MaxIdleConns: 10,
 					MaxLifeTime:  10 * time.Minute,
@@ -179,7 +180,7 @@ func TestConnPool(t *testing.T) {
 
 			ctx := context.TODO()
 
-			pgi, err := New(&tt.args.Config, WithLogger(&zerolog.Logger{}, ""))
+			pgi, err := pginit.New(&tt.args.Config, pginit.WithLogger(&zerolog.Logger{}, ""))
 			if err != nil && !errors.Is(err, tt.want.Err) {
 				t.Errorf("expected (%v) but got (%v)", tt.want.Err, err)
 			}
@@ -247,8 +248,8 @@ func TestConnPoolWithLogger(t *testing.T) {
 
 			ctx := context.Background()
 
-			pgi, err := New(
-				&Config{
+			pgi, err := pginit.New(
+				&pginit.Config{
 					Host:     testHost,
 					Port:     testPort,
 					User:     "postgres",
@@ -256,10 +257,10 @@ func TestConnPoolWithLogger(t *testing.T) {
 					Database: "datawarehouse",
 					MaxConns: 2,
 				},
-				WithLogLevel(tt.lvl),
-				WithLogger(&zerolog.Logger{}, "request-id"),
-				WithDecimalType(),
-				WithUUIDType(),
+				pginit.WithLogLevel(tt.lvl),
+				pginit.WithLogger(&zerolog.Logger{}, "request-id"),
+				pginit.WithDecimalType(),
+				pginit.WithUUIDType(),
 			)
 			if err != nil {
 				t.Error("expected no error")
@@ -295,48 +296,48 @@ func TestConnPool_WithCustomDataTypes(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		opts             []Option
+		opts             []pginit.Option
 		expectErrDecimal bool
 		expectErrUUID    bool
 	}{
 		{
 			name: "decimal + uuid",
-			opts: []Option{
-				WithLogLevel(zerolog.DebugLevel),
-				WithLogger(&zerolog.Logger{}, "request-id"),
-				WithDecimalType(),
-				WithUUIDType(),
+			opts: []pginit.Option{
+				pginit.WithLogLevel(zerolog.DebugLevel),
+				pginit.WithLogger(&zerolog.Logger{}, "request-id"),
+				pginit.WithDecimalType(),
+				pginit.WithUUIDType(),
 			},
 			expectErrDecimal: false,
 			expectErrUUID:    false,
 		},
 		{
 			name: "uuid + decimal",
-			opts: []Option{
-				WithLogLevel(zerolog.DebugLevel),
-				WithLogger(&zerolog.Logger{}, "request-id"),
-				WithUUIDType(),
-				WithDecimalType(),
+			opts: []pginit.Option{
+				pginit.WithLogLevel(zerolog.DebugLevel),
+				pginit.WithLogger(&zerolog.Logger{}, "request-id"),
+				pginit.WithUUIDType(),
+				pginit.WithDecimalType(),
 			},
 			expectErrDecimal: false,
 			expectErrUUID:    false,
 		},
 		{
 			name: "decimal",
-			opts: []Option{
-				WithLogLevel(zerolog.DebugLevel),
-				WithLogger(&zerolog.Logger{}, "request-id"),
-				WithDecimalType(),
+			opts: []pginit.Option{
+				pginit.WithLogLevel(zerolog.DebugLevel),
+				pginit.WithLogger(&zerolog.Logger{}, "request-id"),
+				pginit.WithDecimalType(),
 			},
 			expectErrDecimal: false,
 			expectErrUUID:    true,
 		},
 		{
 			name: "uuid",
-			opts: []Option{
-				WithLogLevel(zerolog.DebugLevel),
-				WithLogger(&zerolog.Logger{}, "request-id"),
-				WithUUIDType(),
+			opts: []pginit.Option{
+				pginit.WithLogLevel(zerolog.DebugLevel),
+				pginit.WithLogger(&zerolog.Logger{}, "request-id"),
+				pginit.WithUUIDType(),
 			},
 			expectErrDecimal: true,
 			expectErrUUID:    false,
@@ -350,8 +351,8 @@ func TestConnPool_WithCustomDataTypes(t *testing.T) {
 
 			ctx := context.Background()
 
-			pgi, err := New(
-				&Config{
+			pgi, err := pginit.New(
+				&pginit.Config{
 					Host:     testHost,
 					Port:     testPort,
 					User:     "postgres",
@@ -390,21 +391,141 @@ func TestConnPool_WithCustomDataTypes(t *testing.T) {
 	}
 }
 
-func BenchmarkConnPool(b *testing.B) {
-	for i := 0; i <= b.N; i++ {
-		ctx := context.Background()
+func TestConnPoolWithCustomTypes_CRUD(t *testing.T) {
+	t.Parallel()
 
-		b.StartTimer()
+	ctx := context.Background()
 
-		pgi, _ := New(
-			&Config{
+	tests := []struct {
+		name string
+	}{
+		{
+			name: "CRUD operation with custom type uuid and decimal",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			pgi, err := pginit.New(&pginit.Config{
 				Host:     testHost,
 				Port:     testPort,
 				User:     "postgres",
 				Password: "postgres",
 				Database: "datawarehouse",
 			},
-			WithLogger(&zerolog.Logger{}, "request-id"),
+				pginit.WithLogger(&zerolog.Logger{}, "request-id"),
+				pginit.WithDecimalType(),
+				pginit.WithUUIDType(),
+			)
+			if err != nil {
+				t.Errorf("expected no error but got: %v", err)
+			}
+
+			pool, err := pgi.ConnPool(ctx)
+			if err != nil {
+				t.Errorf("expected no error but got: %v", err)
+			}
+
+			conn, err := pool.Acquire(ctx)
+			if err != nil {
+				t.Errorf("expected no error but got: %v", err)
+			}
+			defer conn.Release()
+
+			tx, err := conn.BeginTx(ctx, pgx.TxOptions{})
+			if err != nil {
+				t.Errorf("expected no error but got: %v", err)
+			}
+			defer tx.Rollback(ctx)
+
+			_, err = tx.Exec(ctx, "CREATE TABLE IF NOT EXISTS uuid_decimal(uuid uuid, price numeric, PRIMARY KEY (uuid))")
+			if err != nil {
+				t.Errorf("expected no error but got: %v", err)
+			}
+
+			// create
+			row := tx.QueryRow(ctx, "INSERT INTO uuid_decimal(uuid, price) VALUES('b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5', 10.988888888889) RETURNING uuid, price")
+			r := struct {
+				uuid  uuid.UUID
+				price decimal.Big
+			}{}
+			if err := row.Scan(&r.uuid, &r.price); err != nil { // nolint: govet // inline err is within scope
+				t.Errorf("expected no error but got: %v, (%+v)", err, row)
+			}
+			if r.uuid.String() != "b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5" || r.price.Cmp(decimal.New(10988888888889, 12)) != 0 {
+				t.Error("inserted data doesn't match with input")
+			}
+
+			// read
+			rows, err := tx.Query(ctx, "SELECT * FROM uuid_decimal")
+			if err != nil {
+				t.Errorf("expected no error but got: %v", err)
+			}
+			defer rows.Close()
+			var results []struct {
+				uuid  uuid.UUID
+				price decimal.Big
+			}
+			for rows.Next() {
+				r := struct { // nolint: govet // r is within loop scope
+					uuid  uuid.UUID
+					price decimal.Big
+				}{}
+				if err := rows.Scan(&r.uuid, &r.price); err != nil {
+					t.Errorf("expected no error but got: %v", err)
+				}
+				if r.uuid.String() != "b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5" || r.price.Cmp(decimal.New(10988888888889, 12)) != 0 {
+					t.Error("inserted data doesn't match with input")
+				}
+				results = append(results, r)
+			}
+			if len(results) != 1 {
+				t.Errorf("expected 1 result but got: %v", len(results))
+			}
+			// update
+			row = tx.QueryRow(ctx, "UPDATE uuid_decimal SET price = 11.00 WHERE uuid = $1 RETURNING uuid, price", "b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5")
+			if err := row.Scan(&r.uuid, &r.price); err != nil {
+				t.Errorf("expected no error but got: %v, (%+v)", err, row)
+			}
+			if r.price.Cmp(decimal.New(1100, 2)) != 0 {
+				t.Errorf("expected 11.00 but got %+v", r)
+			}
+
+			// delete
+			row = tx.QueryRow(ctx, "DELETE FROM uuid_decimal WHERE uuid = $1 RETURNING uuid, price", "b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5")
+			if err := row.Scan(&r.uuid, &r.price); err != nil {
+				t.Errorf("expected no error but got: %v, (%+v)", err, row)
+			}
+			if r.uuid.String() != "b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5" {
+				t.Error("inserted data doesn't match with input")
+			}
+			row = tx.QueryRow(ctx, "SELECT * FROM uuid_decimal WHERE uuid = $1", "b7202eb0-5bf0-475d-8ee2-d3d2c168a5d5")
+			if err := row.Scan(&r.uuid, &r.price); err != nil && !errors.Is(err, pgx.ErrNoRows) {
+				t.Errorf("expected no error but got: %v, (%+v)", err, row)
+			}
+		})
+	}
+}
+
+func BenchmarkConnPool(b *testing.B) {
+	for i := 0; i <= b.N; i++ {
+		ctx := context.Background()
+
+		b.StartTimer()
+
+		pgi, _ := pginit.New(
+			&pginit.Config{
+				Host:     testHost,
+				Port:     testPort,
+				User:     "postgres",
+				Password: "postgres",
+				Database: "datawarehouse",
+			},
+			pginit.WithLogger(&zerolog.Logger{}, "request-id"),
+			pginit.WithDecimalType(),
+			pginit.WithUUIDType(),
 		)
 
 		pgi.ConnPool(ctx)

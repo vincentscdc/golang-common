@@ -47,7 +47,7 @@ Using standard net/http package
 func RequestLogger(log *zerolog.Logger) func(next http.Handler) http.Handler
 ```
 
-RequestLogger is a middleware that logs the start and end of each request, along with some useful data about what was requested, and some useful response data.
+RequestLogger is a middleware that logs the start and end of each request\, along with some useful data about what was requested\, and some useful response data\.
 
 ## type [ResponseWriterWrapper](<https://github.com/monacohq/golang-common/blob/main/transport/http/middleware/requestlogger/requestlogger.go#L12-L16>)
 

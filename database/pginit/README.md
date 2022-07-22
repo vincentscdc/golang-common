@@ -20,8 +20,17 @@ default LogLevel = Warn
 <p>
 
 ```go
-{
-	pgi, err := New(&Config{
+package main
+
+import (
+	"context"
+	"github.com/monacohq/golang-common/database/pginit"
+	"log"
+	"time"
+)
+
+func main() {
+	pgi, err := pginit.New(&pginit.Config{
 		Host:         "localhost",
 		Port:         "5432",
 		User:         "postgres",
@@ -55,11 +64,22 @@ default LogLevel = Warn
 <p>
 
 ```go
-{
+package main
+
+import (
+	"context"
+	"github.com/monacohq/golang-common/database/pginit"
+	"github.com/rs/zerolog"
+	"log"
+	"os"
+	"time"
+)
+
+func main() {
 	logger := zerolog.New(os.Stderr)
 
-	pgi, err := New(
-		&Config{
+	pgi, err := pginit.New(
+		&pginit.Config{
 			Host:         "localhost",
 			Port:         "5432",
 			User:         "postgres",
@@ -69,8 +89,10 @@ default LogLevel = Warn
 			MaxIdleConns: 10,
 			MaxLifeTime:  1 * time.Minute,
 		},
-		WithLogLevel(zerolog.WarnLevel),
-		WithLogger(&logger, "request-id"),
+		pginit.WithLogLevel(zerolog.WarnLevel),
+		pginit.WithLogger(&logger, "request-id"),
+		pginit.WithDecimalType(),
+		pginit.WithUUIDType(),
 	)
 	if err != nil {
 		log.Fatalf("init pgi config: %v", err)
@@ -130,11 +152,13 @@ Option configures PGInit behaviour\.
 type Option func(*PGInit)
 ```
 
-### func [WithDecimalType](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L132>)
+### func [WithDecimalType](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L133>)
 
 ```go
 func WithDecimalType() Option
 ```
+
+WithDecimalType set pgx decimal type to ericlagergren/decimal\.
 
 ### func [WithLogLevel](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L113>)
 
@@ -152,11 +176,13 @@ func WithLogger(logger *zerolog.Logger, reqIDKeyFromCtx string) Option
 
 WithLogger Add logger to pgx\. if the request context contains request id\, can pass in the request id context key to reqIDKeyFromCtx and logger will log with the request id\. Only will log if the log level is equal and above pgx\.LogLevelWarn\.
 
-### func [WithUUIDType](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L142>)
+### func [WithUUIDType](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L144>)
 
 ```go
 func WithUUIDType() Option
 ```
+
+WithUUIDType set pgx uuid type to gofrs/uuid\.
 
 ## type [PGInit](<https://github.com/monacohq/golang-common/blob/main/database/pginit/pool.go#L28-L32>)
 

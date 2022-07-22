@@ -129,6 +129,7 @@ func WithLogLevel(zLvl zerolog.Level) Option {
 	}
 }
 
+// WithDecimalType set pgx decimal type to ericlagergren/decimal.
 func WithDecimalType() Option {
 	return func(p *PGInit) {
 		p.customDataTypes = append(p.customDataTypes, pgtype.DataType{
@@ -139,6 +140,7 @@ func WithDecimalType() Option {
 	}
 }
 
+// WithUUIDType set pgx uuid type to gofrs/uuid.
 func WithUUIDType() Option {
 	return func(p *PGInit) {
 		p.customDataTypes = append(p.customDataTypes, pgtype.DataType{

@@ -1,4 +1,4 @@
-package pginit
+package pginit_test
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/monacohq/golang-common/database/pginit"
 	"github.com/rs/zerolog"
 )
 
 func Example_connPool() {
-	pgi, err := New(&Config{
+	pgi, err := pginit.New(&pginit.Config{
 		Host:         "localhost",
 		Port:         "5432",
 		User:         "postgres",
@@ -39,8 +40,8 @@ func Example_connPool() {
 func Example_connPoolWithLogger() {
 	logger := zerolog.New(os.Stderr)
 
-	pgi, err := New(
-		&Config{
+	pgi, err := pginit.New(
+		&pginit.Config{
 			Host:         "localhost",
 			Port:         "5432",
 			User:         "postgres",
@@ -50,8 +51,10 @@ func Example_connPoolWithLogger() {
 			MaxIdleConns: 10,
 			MaxLifeTime:  1 * time.Minute,
 		},
-		WithLogLevel(zerolog.WarnLevel),
-		WithLogger(&logger, "request-id"),
+		pginit.WithLogLevel(zerolog.WarnLevel),
+		pginit.WithLogger(&logger, "request-id"),
+		pginit.WithDecimalType(),
+		pginit.WithUUIDType(),
 	)
 	if err != nil {
 		log.Fatalf("init pgi config: %v", err)
